@@ -1,0 +1,580 @@
+[
+  {
+    "Data": {
+      "InvoiceInfo": {
+        "invoiceNumber": "SWLS0074462025",
+        "invoiceDate": "15.04.2025",
+        "invoiceAmountGross": "1156.80",
+        "invoiceAmountNet": "972.10",
+        "taxAmount": "184.70",
+        "paymentDueDate": "29.04.2025",
+        "reason": "Correction due to false meter reading",
+        "refundIncluded": false
+      },
+      "Consumption": {
+        "meterNumber": "329555",
+        "consumptionTotal": 2999,
+        "periods": [
+          {
+            "from": "01.02.2025",
+            "to": "31.12.2025",
+            "consumption": 2745
+          },
+          {
+            "from": "01.01.2026",
+            "to": "31.01.2026",
+            "consumption": 254
+          }
+        ]
+      },
+      "PaymentPlan": {
+        "monthlyAmountGross": "109.00",
+        "monthlyAmountNet": "91.60",
+        "vat": "19%",
+        "dates": [
+          "01.02.2026",
+          "01.03.2026",
+          "01.04.2026",
+          "04.05.2026",
+          "01.06.2026",
+          "01.07.2026",
+          "03.08.2026",
+          "01.09.2026",
+          "01.10.2026",
+          "02.11.2026",
+          "01.12.2026",
+          "04.01.2027"
+        ]
+      },
+      "CostBreakdown": {
+        "NetworkAndMetering": {
+          "amount": 356.45,
+          "percentage": "29.82%",
+          "items": [
+            {
+              "name": "Netznutzung",
+              "amount": 345.4
+            },
+            {
+              "name": "Messung",
+              "amount": 11.05
+            }
+          ]
+        },
+        "TaxesAndLevies": {
+          "amount": 339.68,
+          "percentage": "28.42%",
+          "items": [
+            {
+              "name": "Konzessionsabgabe",
+              "amount": 71.68
+            },
+            {
+              "name": "$19 Strom NEV Umlage",
+              "amount": 27.0
+            },
+            {
+              "name": "Offshore Netzumlage",
+              "amount": 24.47
+            },
+            {
+              "name": "KWKG-Umlage",
+              "amount": 15.86
+            },
+            {
+              "name": "Umsatzsteuer",
+              "amount": 200.67
+            }
+          ]
+        },
+        "ProcurementAndSales": {
+          "amount": 499.19,
+          "percentage": "41.76%"
+        }
+      },
+      "Customer": {
+        "name": "Ulrike Bauer",
+        "address": "Hauptstraße 70, 48268 Greven",
+        "email": "12345@web.de",
+        "iban": "DE35120300001085021036",
+        "customerNumber": "10000593",
+        "contractNumber": "100454-001"
+      },
+      "ContractInfo": {
+        "validUntil": "31.01.2026",
+        "automaticRenewal": "monthly",
+        "basePriceGross": "165.41 €/year",
+        "workPriceGross": "38.08 ct/kWh"
+      }
+    }
+  },
+  {
+    "Data": {
+      "InvoiceInfo": {
+        "invoiceNumber": "212726906320",
+        "invoiceDate": "18.09.2019",
+        "invoiceAmountGross": "833.90",
+        "invoiceAmountNet": "700.76",
+        "taxAmount": "133.14",
+        "paymentDueDate": "not specified",
+        "reason": "Annual consumption billing for 2018/2019",
+        "refundIncluded": true,
+        "refundAmount": "416.10"
+      },
+      "Consumption": {
+        "meterNumber": "1036070044140895",
+        "consumptionTotal": 2585,
+        "periods": [
+          {
+            "from": "01.08.2018",
+            "to": "05.12.2018",
+            "consumption": 928
+          },
+          {
+            "from": "06.12.2018",
+            "to": "31.12.2018",
+            "consumption": 158
+          },
+          {
+            "from": "01.01.2019",
+            "to": "02.01.2019",
+            "consumption": 12
+          },
+          {
+            "from": "03.01.2019",
+            "to": "31.07.2019",
+            "consumption": 1487
+          }
+        ]
+      },
+      "PaymentPlan": {
+        "monthlyAmountGross": "78.00",
+        "monthlyAmountNet": "65.55",
+        "vat": "19%",
+        "dates": [
+          "19.09.2019",
+          "07.10.2019",
+          "07.11.2019",
+          "09.12.2019",
+          "07.01.2020",
+          "07.02.2020",
+          "10.03.2020",
+          "07.04.2020",
+          "07.05.2020",
+          "08.06.2020",
+          "07.07.2020"
+        ]
+      },
+      "CostBreakdown": {
+        "NetworkAndMetering": {
+          "amount": 216.63,
+          "percentage": "26.0%",
+          "items": [
+            {
+              "name": "Netzentgelte",
+              "amount": 207.87
+            },
+            {
+              "name": "Messstellenbetrieb",
+              "amount": 8.76
+            }
+          ]
+        },
+        "TaxesAndLevies": {
+          "amount": 430.71,
+          "percentage": "51.7%",
+          "items": [
+            {
+              "name": "Mehrwertsteuer",
+              "amount": 133.14
+            },
+            {
+              "name": "Stromsteuer",
+              "amount": 52.99
+            },
+            {
+              "name": "Konzessionsabgabe",
+              "amount": 51.44
+            },
+            {
+              "name": "EEG, §19 StromNEV, Offshore, KWKG, abschaltbare Lasten",
+              "amount": 193.14
+            }
+          ]
+        },
+        "ProcurementAndSales": {
+          "amount": 186.56,
+          "percentage": "22.3%"
+        }
+      },
+      "Customer": {
+        "name": "Michael Wagner",
+        "address": "Oberthstr. 15, 33104 Paderborn",
+        "email": "not available",
+        "iban": "DE32XXXXXXXXXXXXXX900",
+        "customerNumber": "232050248646",
+        "contractNumber": "not available"
+      },
+      "ContractInfo": {
+        "validUntil": "31.07.2020",
+        "automaticRenewal": "12 months",
+        "basePriceGross": "119.00 €/year",
+        "workPriceGross": "27.66 ct/kWh"
+      }
+    }
+  },
+  {
+    "Data": {
+      "InvoiceInfo": {
+        "invoiceNumber": "710602280840",
+        "invoiceDate": "02.04.2023",
+        "invoiceAmountGross": "809.94",
+        "invoiceAmountNet": "680.62",
+        "taxAmount": "129.32",
+        "paymentDueDate": "not specified",
+        "reason": "Annual billing with refund",
+        "refundIncluded": true,
+        "refundAmount": "428.06"
+      },
+      "Consumption": {
+        "meterNumber": "1ISK0069108811",
+        "consumptionTotal": 1666,
+        "periods": [
+          {
+            "from": "01.04.2022",
+            "to": "01.05.2022",
+            "consumption": 93
+          },
+          {
+            "from": "24.05.2022",
+            "to": "24.05.2022",
+            "consumption": 64
+          },
+          {
+            "from": "30.06.2022",
+            "to": "30.06.2022",
+            "consumption": 156
+          },
+          {
+            "from": "31.12.2022",
+            "to": "31.12.2022",
+            "consumption": 864
+          },
+          {
+            "from": "27.03.2023",
+            "to": "27.03.2023",
+            "consumption": 489
+          }
+        ]
+      },
+      "PaymentPlan": {
+        "monthlyAmountGross": "76.00",
+        "monthlyAmountNet": "63.87",
+        "vat": "19%",
+        "dates": [
+          "05.05.2023",
+          "05.06.2023",
+          "05.07.2023",
+          "05.08.2023",
+          "05.09.2023",
+          "05.10.2023",
+          "05.11.2023",
+          "05.12.2023",
+          "05.01.2024",
+          "05.02.2024",
+          "05.03.2024"
+        ]
+      },
+      "CostBreakdown": {
+        "NetworkAndMetering": {
+          "amount": 192.69,
+          "percentage": "23.8%",
+          "items": [
+            {
+              "name": "Netznutzungsentgelt",
+              "amount": 176.06
+            },
+            {
+              "name": "Messstellenbetrieb",
+              "amount": 16.63
+            }
+          ]
+        },
+        "TaxesAndLevies": {
+          "amount": 238.12,
+          "percentage": "29.4%",
+          "items": [
+            {
+              "name": "EEG-Umlage",
+              "amount": 11.65
+            },
+            {
+              "name": "Offshore-Netzumlage",
+              "amount": 7.82
+            },
+            {
+              "name": "Umlage abschaltbare Lasten",
+              "amount": 0.03
+            },
+            {
+              "name": "Konzessionsabgabe",
+              "amount": 39.82
+            },
+            {
+              "name": "§19 StromNEV-Umlage",
+              "amount": 7.19
+            },
+            {
+              "name": "KWKG-Umlage",
+              "amount": 6.2
+            },
+            {
+              "name": "Stromsteuer",
+              "amount": 34.15
+            },
+            {
+              "name": "Umsatzsteuer",
+              "amount": 129.32
+            }
+          ]
+        },
+        "ProcurementAndSales": {
+          "amount": 381.07,
+          "percentage": "47%"
+        }
+      },
+      "Customer": {
+        "name": "Michael Wagner",
+        "address": "Meistersingerstr. 44, 45307 Essen",
+        "email": "not available",
+        "iban": "DE32XXXXXXXXXXXXXX8900",
+        "customerNumber": "836648244328",
+        "contractNumber": "not available"
+      },
+      "ContractInfo": {
+        "validUntil": "31.03.2024",
+        "automaticRenewal": "no",
+        "basePriceGross": "14.90 €/month",
+        "workPriceGross": "37.17 ct/kWh"
+      }
+    }
+  },
+  {
+    "Data": {
+      "InvoiceInfo": {
+        "invoiceNumber": "SWLS0074462025",
+        "invoiceDate": "15.04.2025",
+        "invoiceAmountGross": "1156.80",
+        "invoiceAmountNet": "972.10",
+        "taxAmount": "184.70",
+        "paymentDueDate": "29.04.2025",
+        "reason": "Correction due to false meter reading",
+        "refundIncluded": false
+      },
+      "Consumption": {
+        "meterNumber": "329555",
+        "consumptionTotal": 2999,
+        "periods": [
+          {
+            "from": "01.02.2025",
+            "to": "31.12.2025",
+            "consumption": 2745
+          },
+          {
+            "from": "01.01.2026",
+            "to": "31.01.2026",
+            "consumption": 254
+          }
+        ]
+      },
+      "PaymentPlan": {
+        "monthlyAmountGross": "109.00",
+        "monthlyAmountNet": "91.60",
+        "vat": "19%",
+        "dates": [
+          "01.02.2026",
+          "01.03.2026",
+          "01.04.2026",
+          "04.05.2026",
+          "01.06.2026",
+          "01.07.2026",
+          "03.08.2026",
+          "01.09.2026",
+          "01.10.2026",
+          "02.11.2026",
+          "01.12.2026",
+          "04.01.2027"
+        ]
+      },
+      "CostBreakdown": {
+        "NetworkAndMetering": {
+          "amount": 356.45,
+          "percentage": "29.82%",
+          "items": [
+            {
+              "name": "Netznutzung",
+              "amount": 345.4
+            },
+            {
+              "name": "Messung",
+              "amount": 11.05
+            }
+          ]
+        },
+        "TaxesAndLevies": {
+          "amount": 339.68,
+          "percentage": "28.42%",
+          "items": [
+            {
+              "name": "Konzessionsabgabe",
+              "amount": 71.68
+            },
+            {
+              "name": "$19 Strom NEV Umlage",
+              "amount": 27.0
+            },
+            {
+              "name": "Offshore Netzumlage",
+              "amount": 24.47
+            },
+            {
+              "name": "KWKG-Umlage",
+              "amount": 15.86
+            },
+            {
+              "name": "Umsatzsteuer",
+              "amount": 200.67
+            }
+          ]
+        },
+        "ProcurementAndSales": {
+          "amount": 499.19,
+          "percentage": "41.76%"
+        }
+      },
+      "Customer": {
+        "name": "Ulrike Bauer",
+        "address": "Hauptstraße 70, 48268 Greven",
+        "email": "info@e-flow-power.de",
+        "iban": "not specified",
+        "customerNumber": "10000593",
+        "contractNumber": "100454-001"
+      },
+      "ContractInfo": {
+        "validUntil": "31.01.2026",
+        "automaticRenewal": "monthly",
+        "basePriceGross": "165.41 €/year",
+        "workPriceGross": "38.08 ct/kWh"
+      }
+    }
+  },
+  {
+    "Data": {
+      "InvoiceInfo": {
+        "invoiceNumber": "SWLS0073282025",
+        "invoiceDate": "09.04.2025",
+        "invoiceAmountGross": "2914.25",
+        "invoiceAmountNet": "2448.95",
+        "taxAmount": "465.30",
+        "paymentDueDate": "23.04.2025",
+        "reason": "Annual consumption billing for 2025/2026 with partial payments",
+        "refundIncluded": false
+      },
+      "Consumption": {
+        "meterNumber": "544863",
+        "consumptionTotal": 7862,
+        "periods": [
+          {
+            "from": "01.02.2025",
+            "to": "31.12.2025",
+            "consumption": 7195
+          },
+          {
+            "from": "01.01.2026",
+            "to": "31.01.2026",
+            "consumption": 667
+          }
+        ]
+      },
+      "PaymentPlan": {
+        "monthlyAmountGross": "251.00",
+        "monthlyAmountNet": "210.92",
+        "vat": "19%",
+        "dates": [
+          "01.02.2026",
+          "01.03.2026",
+          "01.04.2026",
+          "04.05.2026",
+          "01.06.2026",
+          "01.07.2026",
+          "03.08.2026",
+          "01.09.2026",
+          "01.10.2026",
+          "02.11.2026",
+          "01.12.2026",
+          "04.01.2027"
+        ]
+      },
+      "CostBreakdown": {
+        "NetworkAndMetering": {
+          "amount": 36.5,
+          "percentage": "1.28%",
+          "items": [
+            {
+              "name": "Netznutzung",
+              "amount": 36.5
+            },
+            {
+              "name": "Messung",
+              "amount": 0.0
+            }
+          ]
+        },
+        "TaxesAndLevies": {
+          "amount": 657.78,
+          "percentage": "23.06%",
+          "items": [
+            {
+              "name": "Konzessionsabgabe",
+              "amount": 0.0
+            },
+            {
+              "name": "$19 Strom NEV Umlage",
+              "amount": 70.76
+            },
+            {
+              "name": "Offshore Netzumlage",
+              "amount": 64.15
+            },
+            {
+              "name": "KWKG-Umlage",
+              "amount": 41.6
+            },
+            {
+              "name": "Umsatzsteuer",
+              "amount": 481.27
+            }
+          ]
+        },
+        "ProcurementAndSales": {
+          "amount": 2158.8,
+          "percentage": "75.67%"
+        }
+      },
+      "Customer": {
+        "name": "Ulrike Nr16",
+        "address": "Hauptstraße 70, 48268 Greven",
+        "email": "info@e-flow-power.de",
+        "iban": "DE3XXXXXXXXXXXXXXXX103",
+        "customerNumber": "10000528",
+        "contractNumber": "100389-001"
+      },
+      "ContractInfo": {
+        "validUntil": "31.01.2026",
+        "automaticRenewal": "monthly",
+        "basePriceGross": "165.41 €/year",
+        "workPriceGross": "36.24 ct/kWh"
+      }
+    }
+  }
+]
