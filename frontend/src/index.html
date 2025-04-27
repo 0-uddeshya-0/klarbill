@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KlarBill</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="dark">
+    <div class="container">
+      <div class="top-icon">
+        <svg><!-- your SVG here --></svg>
+      </div>
+      <h1 id="greeting" class="greeting">Hi there!</h1>
+      <div class="chat-box">
+        <div id="message-list" class="message-list"></div>
+        <div id="prompt-list" class="prompt-list"></div>
+        <div class="input-area">
+            <input id="chat-input" type="text" placeholder="How can I help you today?">
+            <!-- Replace your old button with this: -->
+            <button id="send-btn" class="send-btn" aria-label="Send">
+              <svg class="send-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <defs>
+                  <linearGradient id="orangeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#f97316"/>
+                    <stop offset="100%" stop-color="#f59e0b"/>
+                  </linearGradient>
+                </defs>
+                <path d="M2 12l20-8-8 20-4-8-8-4z" fill="url(#orangeGrad)"/>
+              </svg>
+            </button>
+          </div>
+          
+      </div>
+    </div>
+    <div class="theme-toggle">
+      <label class="switch">
+        <input type="checkbox" id="theme-toggle">
+        <span class="slider">
+          <span class="icon sun">☀️</span>
+          <span class="icon moon">🌙</span>
+        </span>
+      </label>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>

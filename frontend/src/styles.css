@@ -1,0 +1,324 @@
+/*----------------------------------------------------
+  Base Reset & Body Themes
+----------------------------------------------------*/
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #000;
+    color: #fff;
+  }
+  body.light {
+    background-color: #f7f7f7;
+    color: #000;
+  }
+  
+  /*----------------------------------------------------
+    Container & Greeting
+  ----------------------------------------------------*/
+  .container {
+    width: 100%;
+    max-width: 720px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .top-icon {
+    margin-bottom: 1.5rem;
+    animation: pulse 2s infinite;
+  }
+  .top-icon svg {
+    width: 2.5rem;
+    height: 2.5rem;
+    stroke: #fb923c;
+  }
+  .greeting {
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  /*----------------------------------------------------
+    Chat Box & Messages
+  ----------------------------------------------------*/
+  .chat-box {
+    background-color: #1f2937;
+    border-radius: 1rem;
+    padding: 1.2rem;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    box-shadow: 0 0 10px rgba(255,255,255,0.1);
+  }
+  body.light .chat-box {
+    background-color: #e5e7eb;
+  }
+  
+  .message-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    overflow-y: auto;
+    max-height: 20rem;
+  }
+  .message-list .user {
+    align-self: flex-end;
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+    max-width: 80%;
+    font-size: 0.875rem;
+    background-color: #374151;
+  }
+  body.light .message-list .user {
+    background-color: #d1d5db;
+  }
+  .message-list .assistant {
+    align-self: flex-start;
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+    max-width: 80%;
+    font-size: 0.875rem;
+    background-color: #4b5563;
+  }
+  body.light .message-list .assistant {
+    background-color: #f3f4f6;
+  }
+  
+  /*----------------------------------------------------
+    Predefined Prompts
+  ----------------------------------------------------*/
+  .prompt-list {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 768px) {
+    .prompt-list {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .prompt-list button {
+    background-color: #374151;
+    color: #fff;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 0.625rem;
+    text-align: left;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  .prompt-list button:hover {
+    background-color: #4b5563;
+  }
+  body.light .prompt-list button {
+    background-color: #d1d5db;
+    color: #000;
+  }
+  body.light .prompt-list button:hover {
+    background-color: #e5e7eb;
+  }
+  
+  /*----------------------------------------------------
+    Input Area
+  ----------------------------------------------------*/
+  .input-area {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #374151;
+  }
+  body.light .input-area {
+    border-top-color: #d1d5db;
+  }
+  .input-area input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: inherit;
+    font-size: 1rem;
+    outline: none;
+  }
+  /* Minimal send button */
+  .send-btn {
+    background: none;
+    border: none;
+    padding: 0.25rem;
+    cursor: pointer;
+    /* add a smooth transition on both move and brightness */
+    transition: transform 0.3s ease, filter 0.3s ease;
+  }
+  
+  .send-btn:hover {
+    /* lift up by 3px */
+    transform: translateY(-3px);
+    /* bump brightness so you really see it */
+    filter: brightness(1.4);
+  }
+  
+  .send-icon {
+    width: 1.75rem;
+    height: 1.75rem;
+    display: block;
+    /* inherit brightness change from parent */
+  }  
+  
+/*----------------------------------------------------
+  Theme Toggle (Fancy Sun/Moon Slider)
+----------------------------------------------------*/
+.theme-toggle {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1000;
+  }
+  
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 70px;
+    height: 34px;
+  }
+  
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  .slider {
+    position: absolute;
+    inset: 0;
+    background-color: #444;
+    border-radius: 34px;
+    transition: background-color 0.4s;
+    overflow: hidden;  /* prevent knob overflow */
+  }
+  
+  .slider::before {
+    content: '';
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    left: 4px;
+    top: 4px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.4s;
+  }
+  
+  /* Slide it over exactly to fit inside */
+  input:checked + .slider::before {
+    transform: translateX(36px);
+  }
+  
+  /* Track color */
+  input:checked + .slider {
+    background-color: #f59e0b;
+  }
+  
+  /* Sun & Moon icons */
+  .icon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.1rem;
+    transition: opacity 0.3s;
+  }
+  
+  .sun {
+    left: 8px;
+    color: #fff;
+    opacity: 0;           /* hidden by default */
+  }
+  
+  .moon {
+    right: 8px;
+    color: #000;
+    opacity: 1;           /* visible by default */
+  }
+  
+  /* When toggled on (light mode), show sun, hide moon */
+  input:checked + .slider .sun {
+    opacity: 1;
+  }
+  
+  input:checked + .slider .moon {
+    opacity: 0;
+  }
+  
+  /* Responsive sizing */
+  @media (max-width: 640px) {
+    .switch {
+      width: 60px;
+      height: 30px;
+    }
+    .slider::before {
+      width: 22px;
+      height: 22px;
+      left: 4px;
+      top: 4px;
+    }
+    input:checked + .slider::before {
+      transform: translateX(30px);
+    }
+  }
+  
+  /*----------------------------------------------------
+    Animations
+  ----------------------------------------------------*/
+  @keyframes pulse {
+    0%,100% { opacity: 1; }
+    50%    { opacity: 0.5; }
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #1c1c1c; /* Dark background for a contrasting effect */
+}
+
+.vine {
+    position: fixed;
+    pointer-events: none; /* Prevents interaction with the vine */
+}
+
+.vine-branch {
+    width: 4px; /* Width of the vine */
+    background-color: #4CAF50; /* Vine color */
+    border-radius: 2px; /* Rounded edges for vines */
+    position: absolute;
+    animation: sway 3s ease-in-out infinite; /* Swaying effect */
+}
+
+/* Glowing bulbs */
+.bulb {
+    position: absolute;
+    background-color: #FFD700; /* Bulb color */
+    border-radius: 50%;
+    height: 12px; /* Bulb size */
+    width: 12px; /* Bulb size */
+    box-shadow: 0 0 10px #FFD700; /* Glowing effect */
+    animation: glow 1s infinite alternate; /* Animation effect */
+}
+
+/* Animation for glowing effect */
+@keyframes glow {
+    0% {
+        opacity: 0.7;
+    }
+    100% {
+        opacity: 1;
+    }
+}
