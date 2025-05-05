@@ -1,0 +1,130 @@
+{
+  "utility_invoice_queries": {
+    "invoice_structure": [
+      {
+        "input": "What sections are mandatory on my energy bill?",
+        "response": "Your invoice must include: 1) Supplier details (name, address, MaLo-ID), 2) Metering point operator info, 3) Invoice amount (highlighted), 4) Price breakdown (network charges, taxes, surcharges), 5) Consumption data (meter readings, graphs), 6) Contract terms, 7) Complaint procedures. Legal basis: §40 EnWG."
+      },
+      {
+        "input": "Where is the MaLo-ID on my invoice?",
+        "response": "The Metering Point Identification Number (MaLo-ID) is under **'Supplied Consumption Point'**. It’s a 33-character code starting with 'DE'."
+      }
+    ],
+    "consumption": [
+      {
+        "input": "How was my consumption calculated?",
+        "response": "Methods: 1) Actual meter reading, 2) Estimated value (historical data/household factors), 3) Self-reported reading. Check **'Determined Consumption'** for details. Dispute estimates by submitting a current reading."
+      },
+      {
+        "input": "Why does my invoice show estimated consumption despite my submitting a reading?",
+        "response": "If your reading was submitted after the billing cutoff date (e.g., Dec 31), the supplier uses the last validated data. Request a corrected invoice under §40a EnWG."
+      },
+      {
+        "input": "How do I read the consumption comparison graphs?",
+        "response": "1) **Yearly Comparison**: Current vs. previous year’s usage. 2) **Peer Comparison**: Your usage vs. similar households. Graphs use kWh for electricity or m³/kWh for gas."
+      },
+      {
+        "input": "Why is my gas bill in kWh, but my meter shows m³?",
+        "response": "Gas is billed in kWh using: **kWh = m³ × Calorific Value × State Number**. Calorific value (energy content) and state number (temp/pressure adjustment) are listed under **'Gas Conversion'**."
+      }
+    ],
+    "pricing_components": [
+      {
+        "input": "What is the '§19 StromNEV surcharge'?",
+        "response": "A fee to compensate grid operators for subsidizing energy-intensive businesses. Calculated as [kWh consumed × current rate]. Rate updates are published quarterly."
+      },
+      {
+        "input": "Why am I paying an offshore network surcharge?",
+        "response": "This funds offshore wind infrastructure. Rate: [Current rate] ct/kWh, per the Energy Industry Act. Exemptions apply for green energy contracts."
+      },
+      {
+        "input": "How is the CO2 tax on gas calculated?",
+        "response": "CO2 price = [Consumption in kWh × current rate (e.g., €0.55/ct per kWh)]. Applies until Dec 31, 2025, under the Fuel Emissions Trading Act."
+      }
+    ],
+    "payments_advances": [
+      {
+        "input": "Why is my advance payment increasing?",
+        "response": "Advance payments adjust based on: 1) Previous underpayment, 2) Price increases (taxes/network fees), 3) Forecasted usage changes. Review **'Next Installment Amount'** under contract terms."
+      },
+      {
+        "input": "Can I withhold payment due to billing errors?",
+        "response": "Yes, under §273 BGB, but only if you formally dispute the invoice and provide evidence (e.g., meter readings). Notify the supplier in writing first."
+      },
+      {
+        "input": "Why wasn’t my credit balance refunded?",
+        "response": "Credits must be offset against the next invoice or paid within 2 weeks (§40c EnWG). If not, send a demand letter via registered mail citing §286 BGB (default interest)."
+      }
+    ],
+    "regulatory_changes": [
+      {
+        "input": "Why did my electricity tax increase?",
+        "response": "Electricity tax rates are set by the Electricity Tax Act. Changes occur due to legislative updates (e.g., 2023 rate: 2.05 ct/kWh). Check the **'Taxes'** section for breakdown."
+      },
+      {
+        "input": "What happens to CO2 costs after 2025?",
+        "response": "Post-2025, CO2 costs will be integrated into revised emissions trading laws. Current rates apply until Dec 31, 2025, under the Fuel Emissions Trading Act."
+      }
+    ],
+    "contract_terms": [
+      {
+        "input": "How do I check if I’m on a basic supply tariff?",
+        "response": "Look under **'Contract'** for 'Basic Supply' status. Basic supply tariffs have regulated pricing; non-basic tariffs are market-driven."
+      },
+      {
+        "input": "When can I terminate my contract?",
+        "response": "Termination is possible from [Next Possible Date] with a [X]-day notice. Check **'Contract Duration'** for exact terms. Early exits may incur fees."
+      }
+    ],
+    "disputes_complaints": [
+      {
+        "input": "How do I challenge an estimated bill?",
+        "response": "1) Submit a current meter reading. 2) Request a corrected invoice in writing. 3) Cite §40a EnWG (estimation rules). 4) Escalate to the Federal Network Agency if unresolved."
+      },
+      {
+        "input": "What if my supplier threatens disconnection over a disputed bill?",
+        "response": "Submit a formal objection citing §273 BGB (right to withhold payment during disputes). Contact the Consumer Service at [Federal Network Agency hotline] for immediate assistance."
+      }
+    ],
+    "calculations_examples": [
+      {
+        "input": "How is my annual consumption projected?",
+        "response": "Projection = (Last year’s usage × adjustment factor) ± recent trends (e.g., new appliances). For gas: Includes heating degree days. Detailed formula under **'Consumption Forecast'**."
+      },
+      {
+        "input": "Can you show a gas-to-kWh calculation example?",
+        "response": "Example: 500 m³ × 10.5 kWh/m³ (calorific value) × 0.95 (state number) = 4,987.5 kWh. Values are supplier-specific."
+      }
+    ],
+    "bonuses_discounts": [
+      {
+        "input": "Why wasn’t my new customer bonus applied?",
+        "response": "Bonuses require: 1) Full contract term completion, 2) No payment delays. Check contract clauses. Dispute via registered mail with proof of eligibility."
+      },
+      {
+        "input": "Is the bonus applied to the basic or working price?",
+        "response": "Depends on your contract. Most bonuses deduct from the total amount. Review **'Discounts Paid'** or contact the supplier for a breakdown."
+      }
+    ],
+    "meter_operations": [
+      {
+        "input": "Who is responsible for meter readings?",
+        "response": "The metering point operator (often the network operator) or your supplier. Smart meters auto-transmit data. Check **'Metering Point Operator'** on the invoice."
+      },
+      {
+        "input": "Can I deny entry for meter reading?",
+        "response": "No. Suppliers/networks have legal access under your contract’s GTC. Refusal may lead to estimates/fees. Request ID from technicians."
+      }
+    ],
+    "miscellaneous": [
+      {
+        "input": "How do I switch suppliers after a billing error?",
+        "response": "1) Resolve outstanding payments. 2) Submit termination citing billing inaccuracies. 3) New supplier handles the switch. No fees if §41 EnWG rights are violated."
+      },
+      {
+        "input": "Where can I compare prices legally?",
+        "response": "Use price comparison tools certified under §41c EnWG (look for the Federal Network Agency’s trust seal). Avoid unofficial portals."
+      }
+    ]
+  }
+}

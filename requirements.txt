@@ -1,0 +1,8 @@
+gpt4all
+langchain
+sentence-transformers
+faiss-cpu
+fastapi
+uvicorn
+pydantic
+python-dotenv
