@@ -1,0 +1,40 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.env/
+.env.bak/
+.venv/
+
+# VS Code settings
+.vscode/
+
+# macOS metadata
+.DS_Store
+
+# Pytest / coverage / logs
+.coverage
+htmlcov/
+*.log
+
+# mypy / pyright / other tooling
+.mypy_cache/
+.pytest_cache/
+.pyre/
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# Firebase credentials
+firebase_credentials.json
+
+# Local model data / caches
+models/
+*.gguf
+
+# Ignore frontend build (if any)
+frontend/dist/
+frontend/node_modules/

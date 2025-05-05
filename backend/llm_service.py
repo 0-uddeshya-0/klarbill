@@ -6,7 +6,7 @@ from functools import lru_cache
 
 class UtilityBillLLM:
     def __init__(self, model_name="mistral-7b-instruct-v0.1.Q4_0.gguf"):
-        self.model_path = "./models/"
+        self.model_path = "./../models/"
         self.model = GPT4All(model_name, model_path=self.model_path)
         self.knowledge = self.load_knowledge()
         self.language_instructions = {
