@@ -38,4 +38,3 @@ models/
 # Ignore frontend build (if any)
 frontend/dist/
 frontend/node_modules/
-backend/data/klarbill_admin_key.json
