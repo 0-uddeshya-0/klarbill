@@ -2,13 +2,14 @@ import qrcode
 import urllib.parse
 import os
 
-def create_qr_code(base_url, customer_name, customer_number):
+def create_qr_code(base_url, customer_name, customer_number, invoice_number):
     # URL-encode the customer name and number
     encoded_name = urllib.parse.quote(customer_name)
-    encoded_number = urllib.parse.quote(customer_number)
+    encoded_customer_number = urllib.parse.quote(customer_number)
+    encoded_invoice_number = urllib.parse.quote(invoice_number)
 
     # Build the full URL
-    full_url = f"{base_url}?name={encoded_name}&number={encoded_number}"
+    full_url = f"{base_url}?name={encoded_name}&customernumber={encoded_customer_number}&invoicenumber={encoded_invoice_number}"
 
     # Generate QR Code
     qr = qrcode.QRCode(

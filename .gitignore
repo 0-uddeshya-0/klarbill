@@ -39,3 +39,4 @@ models/
 frontend/dist/
 frontend/node_modules/
 *.env
+backend/data/klarbill_admin_key.json
