@@ -38,3 +38,4 @@ models/
 # Ignore frontend build (if any)
 frontend/dist/
 frontend/node_modules/
+*.env

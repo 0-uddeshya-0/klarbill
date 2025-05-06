@@ -32,12 +32,3 @@ def create_qr_code(base_url, customer_name, customer_number):
 
     print(f"QR code saved as: {filepath}")
 
-def main():
-    base_url = input("Enter the base URL (e.g., https://example.com/customer): ").strip()
-    customer_name = input("Enter the customer name: ").strip()
-    customer_number = input("Enter the customer number: ").strip()
-
-    create_qr_code(base_url, customer_name, customer_number)
-
-if __name__ == "__main__":
-    main()

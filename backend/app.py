@@ -8,6 +8,10 @@ from llm_service import UtilityBillLLM
 import uvicorn
 import json
 from data.firebase_service import get_db_reference
+from data.upload_invoices import upload_invoices_once
+from config import ensure_config
+
+ensure_config()
 
 app = FastAPI()
 
@@ -20,23 +24,6 @@ app.add_middleware(
 )
 
 llm = UtilityBillLLM()
-
-def upload_invoices_once():
-    ref = get_db_reference('invoices')
-    existing = ref.get()
-
-    if existing:
-        print("Invoices already uploaded. Skipping.")
-        return
-
-    try:
-        with open("data/invoices.json", "r", encoding="utf-8") as f:
-            invoices = json.load(f)
-            for invoice in invoices:
-                ref.push(invoice)
-            print(f"Uploaded {len(invoices)} invoices to Firebase Realtime Database.")
-    except Exception as e:
-        print(f"Error uploading invoices: {e}")
 
 upload_invoices_once()
 
