@@ -12,3 +12,28 @@ def get_db_reference(path="/"):
             'databaseURL': 'https://klarbill-3de73-default-rtdb.europe-west1.firebasedatabase.app/'
         })
     return db.reference(path)
+
+
+# Chat message utilities
+from datetime import datetime
+import uuid
+
+def save_chat_message(customer_number, invoice_number, sender, message):
+    """Save a single chat message to Firebase."""
+    ref = get_db_reference(f"chats/{customer_number}/{invoice_number}")
+    message_id = str(uuid.uuid4())
+    ref.child(message_id).set({
+        "sender": sender,
+        "message": message,
+        "timestamp": datetime.utcnow().isoformat()
+    })
+
+def get_chat_messages_by_invoice(customer_number, invoice_number):
+    """Retrieve all chat messages for a specific invoice."""
+    ref = get_db_reference(f"chats/{customer_number}/{invoice_number}")
+    return ref.get() or {}
+
+def get_chat_messages_by_customer(customer_number):
+    """Retrieve all chat messages for a customer across all invoices."""
+    ref = get_db_reference(f"chats/{customer_number}")
+    return ref.get() or {}
