@@ -37,3 +37,29 @@ def get_chat_messages_by_customer(customer_number):
     """Retrieve all chat messages for a customer across all invoices."""
     ref = get_db_reference(f"chats/{customer_number}")
     return ref.get() or {}
+
+def get_invoice_by_number(invoice_number):
+    """Retrieve a single invoice by invoice number."""
+    ref = get_db_reference("invoices")
+    all_invoices = ref.get() or {}
+
+    for key, entry in all_invoices.items():
+        invoice_data = entry.get("Data", {}).get("InvoiceInfo", {})
+        if invoice_data.get("invoiceNumber") == invoice_number:
+            return {key: entry}
+
+    return {}
+
+def get_invoices_by_customer(customer_number):
+    """Retrieve all invoices for a specific customer number."""
+    ref = get_db_reference("invoices")
+    all_invoices = ref.get() or {}
+
+    matched_invoices = {}
+
+    for key, entry in all_invoices.items():
+        customer_data = entry.get("Data", {}).get("Customer", {})
+        if customer_data.get("customerNumber") == customer_number:
+            matched_invoices[key] = entry
+
+    return matched_invoices
