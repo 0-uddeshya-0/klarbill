@@ -23,7 +23,7 @@ class UtilityBillLLM:
         if self.is_escalation_request(query, language):
             return self.format_escalation_response(language)
             
-        kb_response = self.check_knowledge(query)
+        kb_response = self.check_knowledge(query,language)
         if kb_response:
             return self.format_response(kb_response, language)
             
@@ -46,10 +46,11 @@ class UtilityBillLLM:
         return responses[language]
 
     @lru_cache(maxsize=100)
-    def check_knowledge(self, query: str) -> str:
+    def check_knowledge(self, query: str, language) -> str:
+        itemkey = 'input_'+language
         for category in self.knowledge['utility_invoice_queries'].values():
             for item in category:
-                if item['input'].lower() in query.lower():
+                if item[itemkey].lower() in query.lower():
                     return item['response']
         return ""
     
