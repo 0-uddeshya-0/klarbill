@@ -44,7 +44,7 @@ def get_invoice_by_number(invoice_number):
     all_invoices = ref.get() or {}
 
     for key, entry in all_invoices.items():
-        invoice_data = entry.get("Data", {}).get("InvoiceInfo", {})
+        invoice_data = entry.get("Data", {}).get("ProzessDaten", {}).get("ProzessDatenElement", {})
         if invoice_data.get("invoiceNumber") == invoice_number:
             return {key: entry}
 
@@ -58,7 +58,7 @@ def get_invoices_by_customer(customer_number):
     matched_invoices = {}
 
     for key, entry in all_invoices.items():
-        customer_data = entry.get("Data", {}).get("Customer", {})
+        customer_data = entry.get("Data", {}).get("ProzessDaten", {}).get("ProzessDatenElement", {}).get("Geschaeftspartner", {}).get("GeschaeftspartnerElement", {})
         if customer_data.get("customerNumber") == customer_number:
             matched_invoices[key] = entry
 
