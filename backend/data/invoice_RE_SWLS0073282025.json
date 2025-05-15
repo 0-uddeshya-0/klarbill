@@ -1,0 +1,1008 @@
+{
+  "Data": {
+    "Abrechnungsmengen": {
+      "AbrechnungsmengenElement": [
+        {
+          "meterNumber": "329555",
+          "startMeterReading": "3009",
+          "conversionFactor": null,
+          "meterReadingUnit": "KWH",
+          "consumption": "2745",
+          "dateFrom": "01.02.2026",
+          "readingType": "EXTRAPOLATION_SUPPLIER",
+          "obis": null,
+          "heatingValue": null,
+          "consumptionUnit": "KWH",
+          "meterRegisterName": null,
+          "readingTypeStart": "EXTRAPOLATION_SUPPLIER",
+          "transducerRatio": "1.0",
+          "meterReadingDifference": "2745",
+          "dateTo": "31.12.2026",
+          "maloId": "379a5851-3629-492d-9659-ec885a89436c",
+          "obisMeter": "1-1:1.8.1",
+          "endMeterReading": "5754"
+        },
+        {
+          "meterNumber": "329555",
+          "startMeterReading": "5754",
+          "conversionFactor": null,
+          "meterReadingUnit": "KWH",
+          "consumption": "254",
+          "dateFrom": "01.01.2027",
+          "readingType": "EXTRAPOLATION_SUPPLIER",
+          "obis": null,
+          "heatingValue": null,
+          "consumptionUnit": "KWH",
+          "meterRegisterName": null,
+          "readingTypeStart": "EXTRAPOLATION_SUPPLIER",
+          "transducerRatio": "1.0",
+          "meterReadingDifference": "254",
+          "dateTo": "31.01.2027",
+          "maloId": "379a5851-3629-492d-9659-ec885a89436c",
+          "obisMeter": "1-1:1.8.1",
+          "endMeterReading": "6008"
+        }
+      ],
+      "_datasourceName": "billingQuantities"
+    },
+    "Abrechnungspositionen": {
+      "AbrechnungspositionenElement": [
+        {
+          "priceUnit": "WHOLE",
+          "amount": "127.19",
+          "quantity": "334",
+          "level": "1",
+          "priceType": "BASIC_RATE",
+          "quantityUnit": "DAYS",
+          "tax": "19.0",
+          "grossAmount": "151.36",
+          "dateFrom": "01.02.2026",
+          "type": "INTERNAL",
+          "invoiceItemId": "94b372d5-02fb-4fb2-9380-71e8528d0b28",
+          "price": "139.00",
+          "dateTo": "31.12.2026",
+          "name": "Grundkosten",
+          "taxAmount": "24.17",
+          "Abrechnungspositionen-Detailliert": {
+            "Abrechnungspositionen-DetailliertElement": [
+              {
+                "priceUnit": "WHOLE",
+                "amount": "33.40",
+                "quantity": "334",
+                "level": "2",
+                "priceType": "BASIC_RATE",
+                "quantityUnit": "DAYS",
+                "tax": "19.0",
+                "grossAmount": "39.75",
+                "dateFrom": "01.02.2026",
+                "type": "GRID_USAGE",
+                "invoiceItemId": "96342236-a5a9-4d41-8747-0751f7288a30",
+                "price": "36.50",
+                "dateTo": "31.12.2026",
+                "name": "Grundpreis Netznutzung SLP/TLP",
+                "taxAmount": "6.35"
+              },
+              {
+                "priceUnit": "WHOLE",
+                "amount": "10.11",
+                "quantity": "334",
+                "level": "2",
+                "priceType": "BASIC_RATE",
+                "quantityUnit": "DAYS",
+                "tax": "19.0",
+                "grossAmount": "12.03",
+                "dateFrom": "01.02.2026",
+                "type": "METERING_POINT_OPERATION",
+                "invoiceItemId": "c28e8ccb-3884-4adf-9cde-ca9a4b9fdf25",
+                "price": "11.05",
+                "dateTo": "31.12.2026",
+                "name": "Messstellenbetrieb",
+                "taxAmount": "1.92"
+              }
+            ],
+            "_datasourceName": "billingItemDetails"
+          }
+        },
+        {
+          "priceUnit": "WHOLE",
+          "amount": "11.81",
+          "quantity": "31",
+          "level": "1",
+          "priceType": "BASIC_RATE",
+          "quantityUnit": "DAYS",
+          "tax": "7.0",
+          "grossAmount": "12.64",
+          "dateFrom": "01.01.2027",
+          "type": "INTERNAL",
+          "invoiceItemId": "94b372d5-02fb-4fb2-9380-71e8528d0b28",
+          "price": "139.00",
+          "dateTo": "31.01.2027",
+          "name": "Grundkosten",
+          "taxAmount": "0.83",
+          "Abrechnungspositionen-Detailliert": {
+            "Abrechnungspositionen-DetailliertElement": [
+              {
+                "priceUnit": "WHOLE",
+                "amount": "33.40",
+                "quantity": "334",
+                "level": "2",
+                "priceType": "BASIC_RATE",
+                "quantityUnit": "DAYS",
+                "tax": "19.0",
+                "grossAmount": "39.75",
+                "dateFrom": "01.02.2026",
+                "type": "GRID_USAGE",
+                "invoiceItemId": "96342236-a5a9-4d41-8747-0751f7288a30",
+                "price": "36.50",
+                "dateTo": "31.12.2026",
+                "name": "Grundpreis Netznutzung SLP/TLP",
+                "taxAmount": "6.35"
+              },
+              {
+                "priceUnit": "WHOLE",
+                "amount": "10.11",
+                "quantity": "334",
+                "level": "2",
+                "priceType": "BASIC_RATE",
+                "quantityUnit": "DAYS",
+                "tax": "19.0",
+                "grossAmount": "12.03",
+                "dateFrom": "01.02.2026",
+                "type": "METERING_POINT_OPERATION",
+                "invoiceItemId": "c28e8ccb-3884-4adf-9cde-ca9a4b9fdf25",
+                "price": "11.05",
+                "dateTo": "31.12.2026",
+                "name": "Messstellenbetrieb",
+                "taxAmount": "1.92"
+              }
+            ],
+            "_datasourceName": "billingItemDetails"
+          }
+        },
+        {
+          "priceUnit": "HUNDREDTH",
+          "amount": "878.40",
+          "quantity": "2745",
+          "level": "1",
+          "priceType": "USAGE_RATE",
+          "quantityUnit": "KWH",
+          "tax": "19.0",
+          "grossAmount": "1045.30",
+          "dateFrom": "01.02.2026",
+          "type": "INTERNAL",
+          "invoiceItemId": "e11d162b-0471-42c1-86e9-7085e8defa6b",
+          "price": "32.00",
+          "dateTo": "31.12.2026",
+          "name": "Arbeit",
+          "taxAmount": "166.90",
+          "Abrechnungspositionen-Detailliert": {
+            "Abrechnungspositionen-DetailliertElement": [
+              {
+                "priceUnit": "HUNDREDTH",
+                "amount": "282.74",
+                "quantity": "2745",
+                "level": "2",
+                "priceType": "USAGE_RATE",
+                "quantityUnit": "KWH",
+                "tax": "19.0",
+                "grossAmount": "336.46",
+                "dateFrom": "01.02.2026",
+                "type": "GRID_USAGE",
+                "invoiceItemId": "f4939852-3f3f-4430-9f5d-877eb167d449",
+                "price": "10.30",
+                "dateTo": "31.12.2026",
+                "name": "Arbeitspreis Netznutzung SLP/TLP",
+                "taxAmount": "53.72"
+              },
+              {
+                "priceUnit": "HUNDREDTH",
+                "amount": "24.71",
+                "quantity": "2745",
+                "level": "2",
+                "priceType": "USAGE_RATE",
+                "quantityUnit": "KWH",
+                "tax": "19.0",
+                "grossAmount": "29.40",
+                "dateFrom": "01.02.2026",
+                "type": "LEVY",
+                "invoiceItemId": "b665fdb0-0e9b-4094-8c8b-ca290a85146f",
+                "price": "0.90",
+                "dateTo": "31.12.2026",
+                "name": "§19 Strom NEV Umlage",
+                "taxAmount": "4.69"
+              },
+              {
+                "priceUnit": "HUNDREDTH",
+                "amount": "65.61",
+                "quantity": "2745",
+                "level": "2",
+                "priceType": "USAGE_RATE",
+                "quantityUnit": "KWH",
+                "tax": "19.0",
+                "grossAmount": "78.08",
+                "dateFrom": "01.02.2026",
+                "type": "LEVY",
+                "invoiceItemId": "4accda91-5bcb-4c80-928d-a038211a11fe",
+                "price": "2.39",
+                "dateTo": "31.12.2026",
+                "name": "Konzessionsabgabe",
+                "taxAmount": "12.47"
+              },
+              {
+                "priceUnit": "HUNDREDTH",
+                "amount": "82.35",
+                "quantity": "2745",
+                "level": "2",
+                "priceType": "USAGE_RATE",
+                "quantityUnit": "KWH",
+                "tax": "19.0",
+                "grossAmount": "98.00",
+                "dateFrom": "01.02.2026",
+                "type": "LEVY",
+                "invoiceItemId": "f68c2286-f770-43b1-b0fc-c4adad8fe385",
+                "price": "3.00",
+                "dateTo": "31.12.2026",
+                "name": "KWKG-Umlage",
+                "taxAmount": "15.65"
+              },
+              {
+                "priceUnit": "HUNDREDTH",
+                "amount": "22.40",
+                "quantity": "2745",
+                "level": "2",
+                "priceType": "USAGE_RATE",
+                "quantityUnit": "KWH",
+                "tax": "19.0",
+                "grossAmount": "26.66",
+                "dateFrom": "01.02.2026",
+                "type": "LEVY",
+                "invoiceItemId": "593b00ef-294c-4ec9-9cfd-2db4f70cfca1",
+                "price": "0.82",
+                "dateTo": "31.12.2026",
+                "name": "Offshore-Netzumlage",
+                "taxAmount": "4.26"
+              },
+              {
+                "priceUnit": "HUNDREDTH",
+                "amount": "56.27",
+                "quantity": "2745",
+                "level": "2",
+                "priceType": "USAGE_RATE",
+                "quantityUnit": "KWH",
+                "tax": "19.0",
+                "grossAmount": "66.96",
+                "dateFrom": "01.02.2026",
+                "type": "LEVY",
+                "invoiceItemId": "475db4ad-256f-4a79-85c4-a256b038bb17",
+                "price": "2.05",
+                "dateTo": "31.12.2026",
+                "name": "Stromsteuer",
+                "taxAmount": "10.69"
+              }
+            ],
+            "_datasourceName": "billingItemDetails"
+          }
+        },
+        {
+          "priceUnit": "HUNDREDTH",
+          "amount": "81.28",
+          "quantity": "254",
+          "level": "1",
+          "priceType": "USAGE_RATE",
+          "quantityUnit": "KWH",
+          "tax": "7.0",
+          "grossAmount": "86.97",
+          "dateFrom": "01.01.2027",
+          "type": "INTERNAL",
+          "invoiceItemId": "e11d162b-0471-42c1-86e9-7085e8defa6b",
+          "price": "32.00",
+          "dateTo": "31.01.2027",
+          "name": "Arbeit",
+          "taxAmount": "5.69",
+          "Abrechnungspositionen-Detailliert": {
+            "Abrechnungspositionen-DetailliertElement": [
+              {
+                "priceUnit": "HUNDREDTH",
+                "amount": "282.74",
+                "quantity": "2745",
+                "level": "2",
+                "priceType": "USAGE_RATE",
+                "quantityUnit": "KWH",
+                "tax": "19.0",
+                "grossAmount": "336.46",
+                "dateFrom": "01.02.2026",
+                "type": "GRID_USAGE",
+                "invoiceItemId": "f4939852-3f3f-4430-9f5d-877eb167d449",
+                "price": "10.30",
+                "dateTo": "31.12.2026",
+                "name": "Arbeitspreis Netznutzung SLP/TLP",
+                "taxAmount": "53.72"
+              },
+              {
+                "priceUnit": "HUNDREDTH",
+                "amount": "24.71",
+                "quantity": "2745",
+                "level": "2",
+                "priceType": "USAGE_RATE",
+                "quantityUnit": "KWH",
+                "tax": "19.0",
+                "grossAmount": "29.40",
+                "dateFrom": "01.02.2026",
+                "type": "LEVY",
+                "invoiceItemId": "b665fdb0-0e9b-4094-8c8b-ca290a85146f",
+                "price": "0.90",
+                "dateTo": "31.12.2026",
+                "name": "§19 Strom NEV Umlage",
+                "taxAmount": "4.69"
+              },
+              {
+                "priceUnit": "HUNDREDTH",
+                "amount": "65.61",
+                "quantity": "2745",
+                "level": "2",
+                "priceType": "USAGE_RATE",
+                "quantityUnit": "KWH",
+                "tax": "19.0",
+                "grossAmount": "78.08",
+                "dateFrom": "01.02.2026",
+                "type": "LEVY",
+                "invoiceItemId": "4accda91-5bcb-4c80-928d-a038211a11fe",
+                "price": "2.39",
+                "dateTo": "31.12.2026",
+                "name": "Konzessionsabgabe",
+                "taxAmount": "12.47"
+              },
+              {
+                "priceUnit": "HUNDREDTH",
+                "amount": "82.35",
+                "quantity": "2745",
+                "level": "2",
+                "priceType": "USAGE_RATE",
+                "quantityUnit": "KWH",
+                "tax": "19.0",
+                "grossAmount": "98.00",
+                "dateFrom": "01.02.2026",
+                "type": "LEVY",
+                "invoiceItemId": "f68c2286-f770-43b1-b0fc-c4adad8fe385",
+                "price": "3.00",
+                "dateTo": "31.12.2026",
+                "name": "KWKG-Umlage",
+                "taxAmount": "15.65"
+              },
+              {
+                "priceUnit": "HUNDREDTH",
+                "amount": "22.40",
+                "quantity": "2745",
+                "level": "2",
+                "priceType": "USAGE_RATE",
+                "quantityUnit": "KWH",
+                "tax": "19.0",
+                "grossAmount": "26.66",
+                "dateFrom": "01.02.2026",
+                "type": "LEVY",
+                "invoiceItemId": "593b00ef-294c-4ec9-9cfd-2db4f70cfca1",
+                "price": "0.82",
+                "dateTo": "31.12.2026",
+                "name": "Offshore-Netzumlage",
+                "taxAmount": "4.26"
+              },
+              {
+                "priceUnit": "HUNDREDTH",
+                "amount": "56.27",
+                "quantity": "2745",
+                "level": "2",
+                "priceType": "USAGE_RATE",
+                "quantityUnit": "KWH",
+                "tax": "19.0",
+                "grossAmount": "66.96",
+                "dateFrom": "01.02.2026",
+                "type": "LEVY",
+                "invoiceItemId": "475db4ad-256f-4a79-85c4-a256b038bb17",
+                "price": "2.05",
+                "dateTo": "31.12.2026",
+                "name": "Stromsteuer",
+                "taxAmount": "10.69"
+              }
+            ],
+            "_datasourceName": "billingItemDetails"
+          }
+        }
+      ],
+      "_datasourceName": "billingItems"
+    },
+    "Abrechnungspositionen_NN": {
+      "Abrechnungspositionen_NNElement": [
+        {
+          "priceUnit": "WHOLE",
+          "amount": "33.40",
+          "quantity": null,
+          "level": "2",
+          "priceType": null,
+          "tax": "19.00",
+          "quantityUnit": null,
+          "grossAmount": "39.75",
+          "dateFrom": "01.02.2026",
+          "type": null,
+          "invoiceItemId": "96342236-a5a9-4d41-8747-0751f7288a30",
+          "price": null,
+          "dateTo": "31.12.2026",
+          "name": "Grundpreis Netznutzung SLP/TLP",
+          "taxAmount": "6.35"
+        },
+        {
+          "priceUnit": "WHOLE",
+          "amount": "282.74",
+          "quantity": null,
+          "level": "2",
+          "priceType": null,
+          "tax": "19.00",
+          "quantityUnit": null,
+          "grossAmount": "336.46",
+          "dateFrom": "01.02.2026",
+          "type": null,
+          "invoiceItemId": "f4939852-3f3f-4430-9f5d-877eb167d449",
+          "price": null,
+          "dateTo": "31.12.2026",
+          "name": "Arbeitspreis Netznutzung SLP/TLP",
+          "taxAmount": "53.72"
+        },
+        {
+          "priceUnit": "WHOLE",
+          "amount": "3.10",
+          "quantity": null,
+          "level": "2",
+          "priceType": null,
+          "tax": "7.00",
+          "quantityUnit": null,
+          "grossAmount": "3.32",
+          "dateFrom": "01.01.2027",
+          "type": null,
+          "invoiceItemId": "96342236-a5a9-4d41-8747-0751f7288a30",
+          "price": null,
+          "dateTo": "31.01.2027",
+          "name": "Grundpreis Netznutzung SLP/TLP",
+          "taxAmount": "0.22"
+        },
+        {
+          "priceUnit": "WHOLE",
+          "amount": "26.16",
+          "quantity": null,
+          "level": "2",
+          "priceType": null,
+          "tax": "7.00",
+          "quantityUnit": null,
+          "grossAmount": "27.99",
+          "dateFrom": "01.01.2027",
+          "type": null,
+          "invoiceItemId": "f4939852-3f3f-4430-9f5d-877eb167d449",
+          "price": null,
+          "dateTo": "31.01.2027",
+          "name": "Arbeitspreis Netznutzung SLP/TLP",
+          "taxAmount": "1.83"
+        }
+      ],
+      "_datasourceName": "billingItems"
+    },
+    "Abschlagsplan": {
+      "AbschlagsplanElement": {
+        "amount": "1176.00",
+        "periodicPaymentDate": "START_OF_PERIOD",
+        "vat": "7.0",
+        "firstPaymentDate": "01.02.2027",
+        "dates": "01.02.2027, 01.03.2027, 01.04.2027, 03.05.2027, 01.06.2027, 01.07.2027, 02.08.2027, 01.09.2027, 01.10.2027, 01.11.2027, 01.12.2027, 03.01.2028",
+        "invoiceAmount": "1175.59",
+        "debtorId": "958e35ad-cff1-4661-a13a-c178f5f3eed2",
+        "consumptionUnit": "KWH",
+        "workPrice": "32.00",
+        "partPaymentAmount": "98.00",
+        "partPaymentAmountNet": "91.59",
+        "lastPaymentDate": "03.01.2028",
+        "partPaymentAmountVat": "6.41",
+        "paymentPeriod": "MONTH",
+        "totalPartPaymentAmount": "1176.00",
+        "paymentCount": "12",
+        "annualConsumption": "2999",
+        "basePrice": "139.00"
+      },
+      "_datasourceName": "partPaymentPlan"
+    },
+    "Abschlagstermine": {
+      "AbschlagstermineElement": [
+        {
+          "date": "2027-02-01",
+          "amount": "98.00"
+        },
+        {
+          "date": "2027-03-01",
+          "amount": "98.00"
+        },
+        {
+          "date": "2027-04-01",
+          "amount": "98.00"
+        },
+        {
+          "date": "2027-05-03",
+          "amount": "98.00"
+        },
+        {
+          "date": "2027-06-01",
+          "amount": "98.00"
+        },
+        {
+          "date": "2027-07-01",
+          "amount": "98.00"
+        },
+        {
+          "date": "2027-08-02",
+          "amount": "98.00"
+        },
+        {
+          "date": "2027-09-01",
+          "amount": "98.00"
+        },
+        {
+          "date": "2027-10-01",
+          "amount": "98.00"
+        },
+        {
+          "date": "2027-11-01",
+          "amount": "98.00"
+        },
+        {
+          "date": "2027-12-01",
+          "amount": "98.00"
+        },
+        {
+          "date": "2028-01-03",
+          "amount": "98.00"
+        }
+      ]
+    },
+    "Abschlagszahlungen": {
+      "_datasourceName": "paymentsInAdvance"
+    },
+    "Bonus-und-Rabatte": {
+      "Bonus-und-RabatteElement": {
+        "taxRate": "19.0",
+        "discountPeriodStop": "",
+        "finalDiscountExclVat": "-84.03",
+        "taxKey": "U19",
+        "name": "Neukunden",
+        "discountAmount": "100.00",
+        "discountType": "STARTER_BONUS",
+        "finalDiscount": "-100.00",
+        "taxAmount": "-15.97",
+        "discountPeriodStart": ""
+      },
+      "_datasourceName": "billDiscounts"
+    },
+    "Kostenblock": {
+      "KostenblockElement": [
+        {
+          "priceUnit": null,
+          "amount": "356.45",
+          "quantity": "0",
+          "namePrintBlock": "Zusammensetzung der Kosten",
+          "printItemName": "Netz und Messung",
+          "rank": "1",
+          "quantityUnit": null,
+          "percentageAmount": "28.87",
+          "printPosition": "05eb6921-a219-4170-be33-83c15fd102f4",
+          "Kostenblock-Detail": {
+            "Kostenblock-DetailElement": [
+              {
+                "priceUnit": "€",
+                "amount": "345.40",
+                "quantity": "3364",
+                "namePrintBlock": "Zusammensetzung der Kosten",
+                "printItemName": "Netznutzung",
+                "rank": "1",
+                "quantityUnit": "WHOLE",
+                "printPosition": "79dc5ec4-9422-47d9-ac21-a8ad617fddc2"
+              },
+              {
+                "priceUnit": "€",
+                "amount": "11.05",
+                "quantity": "365",
+                "namePrintBlock": "Zusammensetzung der Kosten",
+                "printItemName": "Messung",
+                "rank": "2",
+                "quantityUnit": "WHOLE",
+                "printPosition": "c7192b6e-7e44-4088-8153-1962a5d8f40b"
+              }
+            ],
+            "_datasourceName": "printItemSubLevel"
+          }
+        },
+        {
+          "priceUnit": null,
+          "amount": "410.70",
+          "quantity": "0",
+          "namePrintBlock": "Zusammensetzung der Kosten",
+          "printItemName": "Steuern und Umlagen",
+          "rank": "2",
+          "quantityUnit": null,
+          "percentageAmount": "33.26",
+          "printPosition": "a16b7374-9ccf-4947-9f06-e1ddc4dd0fca",
+          "Kostenblock-Detail": {
+            "Kostenblock-DetailElement": [
+              {
+                "priceUnit": "€",
+                "amount": "71.68",
+                "quantity": "2999",
+                "namePrintBlock": "Zusammensetzung der Kosten",
+                "printItemName": "Konzessionsabgabe",
+                "rank": "2",
+                "quantityUnit": "HUNDREDTH",
+                "printPosition": "18cfb552-8716-476c-abbb-77a19281c732"
+              },
+              {
+                "priceUnit": "€",
+                "amount": "27.00",
+                "quantity": "2999",
+                "namePrintBlock": "Zusammensetzung der Kosten",
+                "printItemName": "$19 Strom NEV Umlage",
+                "rank": "3",
+                "quantityUnit": "HUNDREDTH",
+                "printPosition": "731d28d8-8f88-4ca0-882f-46b619859419"
+              },
+              {
+                "priceUnit": "€",
+                "amount": "24.47",
+                "quantity": "2999",
+                "namePrintBlock": "Zusammensetzung der Kosten",
+                "printItemName": "Offshore Netzumlage",
+                "rank": "5",
+                "quantityUnit": "HUNDREDTH",
+                "printPosition": "265cd174-549f-4066-bb0b-6ba047dd0d6c"
+              },
+              {
+                "priceUnit": "€",
+                "amount": "89.97",
+                "quantity": "2999",
+                "namePrintBlock": "Zusammensetzung der Kosten",
+                "printItemName": "KWKG-Umlage",
+                "rank": "6",
+                "quantityUnit": "HUNDREDTH",
+                "printPosition": "27221689-4c63-4709-9b34-f5463a808ab3"
+              },
+              {
+                "priceUnit": "€",
+                "amount": "197.58",
+                "quantity": "0",
+                "namePrintBlock": "Zusammensetzung der Kosten",
+                "printItemName": "Umsatzsteuer",
+                "rank": "7",
+                "quantityUnit": null,
+                "printPosition": "aae1306d-0e89-4647-ac59-be3bc7d73f9b"
+              }
+            ],
+            "_datasourceName": "printItemSubLevel"
+          }
+        },
+        {
+          "priceUnit": "HUNDREDTH",
+          "amount": "467.63",
+          "quantity": "3364",
+          "namePrintBlock": "Zusammensetzung der Kosten",
+          "printItemName": "Beschaffung und Vertrieb",
+          "rank": "3",
+          "quantityUnit": "HUNDREDTH",
+          "percentageAmount": "37.87",
+          "printPosition": "5a8f1072-809e-4d28-806b-bfebde1d2275",
+          "Kostenblock-Detail": {
+            "Kostenblock-DetailElement": [
+              {
+                "priceUnit": "€",
+                "amount": "36.50",
+                "quantity": "365",
+                "namePrintBlock": "Zusammensetzung der Kosten",
+                "printItemName": "Netznutzung",
+                "rank": "1",
+                "quantityUnit": "WHOLE",
+                "printPosition": "568eca25-aa51-4fe7-ae31-28efdf3d8ef1"
+              },
+              {
+                "priceUnit": "€",
+                "amount": "11.05",
+                "quantity": "365",
+                "namePrintBlock": "Zusammensetzung der Kosten",
+                "printItemName": "Messung",
+                "rank": "2",
+                "quantityUnit": "WHOLE",
+                "printPosition": "25ba692a-ed3e-433f-8ca5-9124e256681a"
+              }
+            ],
+            "_datasourceName": "printItemSubLevel"
+          }
+        }
+      ],
+      "_datasourceName": "printGroup"
+    },
+    "ProzessDaten": {
+      "ProzessDatenElement": {
+        "priceChangeDate": null,
+        "netInvoiceAmount": "1098.68",
+        "productID": "b4db3a0c-27ca-4fd7-ae88-9bd4c1d62a9a",
+        "bonusIncluded": "false",
+        "bonus": "0.00",
+        "invoiceAmount": "1296.26",
+        "productName": "Donaustrom",
+        "netInvoiceAmountWithoutBonus": "1098.68",
+        "annualConsumptionLastInvoice": "2999",
+        "balance": "55.00",
+        "contractAccountId": "adc1efe5-1691-4b13-b5ea-6ea5cea8101e",
+        "contractID": "d26059d4-3afb-4c58-81cd-e61229ca9580",
+        "consumptionLastInvoice": "2999",
+        "invoiceType": "PERIODIC_BILL",
+        "sector": "Strom",
+        "correctionInvoiceDate": null,
+        "annualConsumption": "2999",
+        "invoicePeriodFrom": "01.02.2026",
+        "businessPartnerUsageId": null,
+        "consumptionDeviationLastInvoice": "0.00",
+        "contractAccountNumber": "100454",
+        "contractNumber": "100454-001",
+        "tax": "19.0",
+        "consumptionDaysLastInvoice": "364",
+        "singleTariffMeter": null,
+        "paymentDueDate": "29.04.2025",
+        "currentWorkPrice": "38.08",
+        "taxPayments": null,
+        "currentBasePrice": "165.41",
+        "receivables": "0.00",
+        "meterReadingBilling": null,
+        "taxAmount": "197.58",
+        "adjustPartialPayments": "true",
+        "balanceIncluded": "true",
+        "refund": "false",
+        "taxInvoiceAmountWithoutBonus": "197.58",
+        "payments": "0.00",
+        "receivablesIncluded": "false",
+        "invoicePeriodTo": "31.01.2027",
+        "paymentAmount": "1241.26",
+        "consumptionUnit": "kWh",
+        "duration": null,
+        "taxBonus": "0.00",
+        "energyMixID": "53272a04-ffc2-49ee-abc1-2dd797d73ec8",
+        "invoiceNumber": "SWLS0074472025",
+        "netBonus": "0.00",
+        "correctionInvoiceAmount": null,
+        "businessPartnerId": "37c93aef-c677-41ed-b67c-7d0c05a3e767",
+        "additionalPayment": "true",
+        "reasonForCancellation": null,
+        "consumption": "2999",
+        "invoiceDate": "15.04.2025",
+        "accountingPointId": "379a5851-3629-492d-9659-ec885a89436c",
+        "invoiceCorrection": "false",
+        "invoiceAmountWithoutBonus": "1296.26",
+        "netPayments": null,
+        "nextBasePrice": null,
+        "consumptionDays": "365",
+        "sectorType": "POWER",
+        "correctionInvoiceNumber": null,
+        "nextWorkPrice": null,
+        "Geschaeftspartner": {
+          "GeschaeftspartnerElement": {
+            "zipCode": "48268",
+            "creditCardExpirationDateMonth": null,
+            "accountDomain": null,
+            "mobileNumber": "1577745678",
+            "creditCardType": "NULL",
+            "poBox": null,
+            "accountHolder": "Konrad Konto",
+            "referenceDomain": null,
+            "outgoingCreditCardExpirationDateMonth": null,
+            "contractAccountId": null,
+            "outgoingCreditCardExpirationDateYear": null,
+            "houseNumberSuffix": null,
+            "contractAccountNumber": null,
+            "kind": "NATURAL",
+            "addressType": "POST",
+            "accountType": null,
+            "addressText": "Ulrike Bauer\nHauptstra�e 70\n48268 Greven",
+            "firstName": "Ulrike",
+            "accountId": null,
+            "phoneNumber": null,
+            "creditCardNumber": null,
+            "iban": "DE35120300001085021036",
+            "name": "Bauerhaus",
+            "salutation": "Frau",
+            "city": "Greven",
+            "paymentAccountType": "BANK_ACCOUNT",
+            "houseNumber": "70",
+            "creditCardExpirationDateYear": null,
+            "referenceType": null,
+            "title": null,
+            "referenceId": null,
+            "outgoingUsername": null,
+            "paymentMethodTypeMain": "PAYMENTACCOUNT",
+            "street": "Hauptstra�e",
+            "countryCode": "DE",
+            "outgoingAccountHolder": null,
+            "outgoingPaymentAccountType": null,
+            "email": "12345@web.de",
+            "businessPartnerId": "37c93aef-c677-41ed-b67c-7d0c05a3e767",
+            "outgoingIban": null,
+            "outgoingBic": null,
+            "outgoingCardHolder": null,
+            "outgoingCreditCardNumber": null,
+            "cardHolder": null,
+            "customerNumber": "10000593",
+            "salutationText": "Sehr geehrte Frau Bauer",
+            "mandateReferenceNumber": "M-10000593-001",
+            "outgoingCreditCardType": null,
+            "bic": "BYLADEM1001",
+            "username": null
+          },
+          "_datasourceName": "businessPartner"
+        },
+        "MeLo-Datenquelle": {
+          "MeLo-DatenquelleElement": {
+            "meloId": "DE7866452637128490125989623490412",
+            "validFrom": "01.02.2026",
+            "validTo": "31.12.2099"
+          },
+          "_datasourceName": "meloDeviceDataProducer"
+        },
+        "Produkt": {
+          "ProduktElement": {
+            "number": "1027",
+            "sectorId": "2df6cd27-89f1-4c8b-b23e-5f7a14b8d74a",
+            "energyMixId": "53272a04-ffc2-49ee-abc1-2dd797d73ec8",
+            "name": "Donaustrom",
+            "generalProductTermId": "b1f71352-4186-482f-891b-0ea8f1d66842",
+            "sectorType": "Strom"
+          },
+          "_datasourceName": "product"
+        },
+        "Strommix": {
+          "StrommixElement": {
+            "image": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII="
+          },
+          "_datasourceName": "energyMix"
+        },
+        "Vertrag": {
+          "VertragElement": {
+            "inMinimumTerm": "true",
+            "minimumTerm": "1",
+            "productId": "b4db3a0c-27ca-4fd7-ae88-9bd4c1d62a9a",
+            "periodicCancellationReference": null,
+            "minimumTermReference": null,
+            "cancellationReason": "NULL",
+            "contractStartDate": "01.02.2025",
+            "keyDateNextInvoice": "31.01.2028",
+            "periodicCancellationUnit": "MONTHS",
+            "minimumTermDate": null,
+            "periodOfNotice": "4",
+            "periodOfNoticeUnit": "WEEKS",
+            "contractStopDate": null,
+            "contractCommitment": "31.01.2026",
+            "number": "100454-001",
+            "minimumTermUnit": "YEARS",
+            "invoicePeriod": "YEAR",
+            "partialPaymentPeriod": "MONTH",
+            "periodicCancellationDates": "1",
+            "generalProductTermVersion": "einzige AGB - einzige Version",
+            "status": "ACTIVE",
+            "cancellationDate": null
+          },
+          "_datasourceName": "contract"
+        }
+      },
+      "_datasourceName": "customerInvoiceProcessData"
+    },
+    "SonstigeForderungen": {
+      "_datasourceName": "paymentsReceivablesProducer"
+    },
+    "SonstigeGuthaben": {
+      "SonstigeGuthabenElement": {
+        "date": "15.04.2025",
+        "amount": "55.00",
+        "postingText": "Sofortbonus sofort nach 3 Tagen"
+      },
+      "_datasourceName": "paymentsCreditsProducer"
+    },
+    "Verbrauchsstelle": {
+      "VerbrauchsstelleElement": {
+        "addressSupplement": null,
+        "measuringPointOperator": "Messstellenbetreiber Test",
+        "address": "48268",
+        "city": "Greven",
+        "street": "Hauptstra�e",
+        "houseNumber": "70",
+        "houseNumberSupplement": null,
+        "gridOperatorId": "70ea31b7-7103-46ac-afca-51bd2d1f73f0",
+        "gridOperator": "Netzbetreiber Test",
+        "maloId": "83301340424",
+        "measuringPointOperatorId": "9a889bc6-38f2-4f9b-8a9c-af454331a4d4",
+        "MSB": {
+          "MSBElement": {
+            "zipCode": "89081",
+            "idType": "9a889bc6-38f2-4f9b-8a9c-af454331a4d4",
+            "houseNumberSuffix": null,
+            "city": "Ulm",
+            "allocationOrg": "BDEW",
+            "keyThirdPartySystem": "Messstellenbetreiber Test",
+            "houseNumber": "10000006",
+            "businessPartner_idType": "98f8fbdf-2761-4fb2-aaa4-bfaf88713ba1",
+            "type": "STREET",
+            "poBox": null,
+            "marketRoleType": "METER_OPERATOR",
+            "street": "Musterstraße",
+            "countryCode": "DE",
+            "identificationNumber": "9910245000007",
+            "sector_name": "Strom",
+            "sectorType": "POWER"
+          },
+          "_datasourceName": "marketPartner"
+        },
+        "Netzbetreiber": {
+          "NetzbetreiberElement": {
+            "zipCode": "89081",
+            "idType": "70ea31b7-7103-46ac-afca-51bd2d1f73f0",
+            "houseNumberSuffix": null,
+            "city": "Ulm",
+            "allocationOrg": "BDEW",
+            "keyThirdPartySystem": "Netzbetreiber Test",
+            "houseNumber": "10000005",
+            "businessPartner_idType": "26dddf4a-a60c-45b3-a16a-b39781987ead",
+            "type": "STREET",
+            "poBox": null,
+            "marketRoleType": "GRID_OPERATOR",
+            "street": "Musterstraße",
+            "countryCode": "DE",
+            "identificationNumber": "9900645000004",
+            "sector_name": "Strom",
+            "sectorType": "POWER"
+          },
+          "_datasourceName": "marketPartner"
+        }
+      },
+      "_datasourceName": "pointOfConsuming"
+    },
+    "Verbrauchsvergleich": {
+      "VerbrauchsvergleichElement": {
+        "sourceOfProof": "BDEW",
+        "consumptionLastPeriod": "2999",
+        "consumptionLastPeriodStart": "01.02.2025",
+        "consumption": "2999",
+        "consumptionLastPeriodStop": "31.01.2026",
+        "Verbrauchsvergleich_Daten": {
+          "Verbrauchsvergleich_DatenElement": [
+            {
+              "categoryB": "2500",
+              "categoryC": "4000",
+              "categoryD": "4000",
+              "categoryA": "2000",
+              "label": "1 Personen-Haushalt"
+            },
+            {
+              "categoryB": "3600",
+              "categoryC": "4200",
+              "categoryD": "4200",
+              "categoryA": "2500",
+              "label": "2 Personen-Haushalt"
+            },
+            {
+              "categoryB": "4200",
+              "categoryC": "4800",
+              "categoryD": "4800",
+              "categoryA": "3000",
+              "label": "3 Personen-Haushalt"
+            },
+            {
+              "categoryB": "4200",
+              "categoryC": "4800",
+              "categoryD": "4800",
+              "categoryA": "3000",
+              "label": "4 Personen-Haushalt"
+            }
+          ],
+          "_datasourceName": "customerInvoiceConsumptionComparisonValue"
+        }
+      },
+      "_datasourceName": "customerInvoiceConsumptionComparison"
+    }
+  }
+}
