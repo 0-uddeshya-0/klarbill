@@ -6,6 +6,7 @@ const promptList = document.getElementById('prompt-list');
 const messageList = document.getElementById('message-list');
 const input = document.getElementById('chat-input');
 const sendBtn = document.getElementById('send-btn');
+const BACKEND_BASE_URL = 'http://localhost:8000';
 
 // Parse URL parameters for customer/invoice numbers and persist to localStorage if present
 const urlParams = new URLSearchParams(window.location.search);
@@ -31,7 +32,7 @@ if (storedGreeting) {
 // document.getElementById('greeting').innerText = translations[currentLanguage].defaultGreeting;
 
 if ((urlCustomerNumber || urlInvoiceNumber) && !storedGreeting) {
-  fetch('http://localhost:8000/customer_name', {
+  fetch(`${BACKEND_BASE_URL}/customer_name`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -102,6 +103,29 @@ function updateLanguageUI() {
   const storedGreeting = localStorage.getItem('customerGreeting');
   if (storedGreeting) {
     document.getElementById('greeting').innerText = storedGreeting;
+  }
+
+  // Re-fetch greeting in new language if customer/invoice number exists
+
+  if ((currentCustomerNumber || currentInvoiceNumber)) {
+    fetch(`${BACKEND_BASE_URL}/customer_name`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customer_number: currentCustomerNumber,
+        invoice_number: currentInvoiceNumber,
+        language: currentLanguage
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.customer_greeting) {
+        const greeting = translations[currentLanguage].greeting(data.customer_greeting);
+        document.getElementById('greeting').innerText = greeting;
+        localStorage.setItem('customerGreeting', greeting);
+      }
+    })
+    .catch(err => console.error('Greeting fetch error on language change:', err));
   }
 }
 
@@ -230,7 +254,7 @@ async function sendMessage(text) {
   };
 
   try {
-    const response = await fetch('http://localhost:8000/chat', {
+    const response = await fetch(`${BACKEND_BASE_URL}/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
