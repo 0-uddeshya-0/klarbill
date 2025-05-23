@@ -457,7 +457,7 @@ body.light .message-list .assistant {
   border-left: 3px solid #f59e0b;
 }
 
-/* Animation for typing indicator */
+/* Animation for typing indicator 
 .typing::after {
   content: '...';
   display: inline-block;

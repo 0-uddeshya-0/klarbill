@@ -279,7 +279,16 @@ class AgenticUtilityBillLLM:
         
         # Customer information
         partner = analyzer.partner_data
-        salutation = partner.get("salutation", "Dear Customer")
+        raw_salutation = partner.get("salutation", "Dear Customer")
+        if language == "en":
+            if raw_salutation.lower() == "frau":
+                salutation = "Ms."
+            elif raw_salutation.lower() == "herr":
+                salutation = "Mr."
+            else:
+                salutation = "Dear"
+        else:
+            salutation = raw_salutation
         first_name = partner.get("name", "")
         customer_name = f"{first_name} {partner.get('name', '')}".strip()
         
