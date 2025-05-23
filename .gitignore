@@ -41,5 +41,6 @@ frontend/node_modules/
 *.env
 backend/data/klarbill_admin_key.json
 backend/__pycache__
-*/__pycache__
-*/__pycache__/*
+**/__pycache__/
+
+**/qr_*

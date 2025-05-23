@@ -1,15 +1,11 @@
 import os
 import json
 from data.firebase_service import get_db_reference
-from createQr import create_qr_code
+from .createQr import create_qr_code
 
 def upload_invoices_once():
     ref = get_db_reference('invoices')
-    existing = ref.get()
-
-    if existing:
-        print("Invoices already uploaded. Skipping.")
-        return
+    existing = ref.get() or {}
 
     base_url = os.getenv("QR_BASE_URL", "http://127.0.0.1:8000") #todo: change default url to what the frontend runs on
 
@@ -38,12 +34,22 @@ def upload_invoices_once():
                 salutation = business_partner.get("salutation")
                 invoice_number = process_data.get("invoiceNumber")
 
-                ref.push(invoice)
-                print(f"Uploaded invoice file: {os.path.basename(file_path)}")
+                # Check if the invoice is already in Firebase (based on invoice number)
+                already_uploaded = any(
+                    inv.get("Data", {}).get("ProzessDaten", {}).get("ProzessDatenElement", {}).get("invoiceNumber") == invoice_number
+                    for inv in existing.values()
+                )
+
+                if not already_uploaded:
+                    ref.push(invoice)
+                    print(f"Uploaded invoice file: {os.path.basename(file_path)}")
+                else:
+                    print(f"Invoice {invoice_number} already uploaded. Skipping upload.")
+
                 full_name = f"{salutation} {customer_name}".strip()
                 if full_name and customer_number and invoice_number:
                     create_qr_code(base_url, full_name, str(customer_number), str(invoice_number))
                 else:
                     print(f"Skipping QR code generation due to missing data. Name: {full_name}, Number: {customer_number}, Invoice: {invoice_number}")
         except Exception as e:
-            print(f"Error uploading invoice from {file_path}: {e}")
+            print(f"Error processing invoice from {file_path}: {e}")

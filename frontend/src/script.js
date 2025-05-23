@@ -23,6 +23,34 @@ if (urlInvoiceNumber) {
 let currentLanguage = localStorage.getItem('language') || 'en';
 let currentCustomerNumber = urlCustomerNumber || localStorage.getItem('customerNumber') || null;
 let currentInvoiceNumber = urlInvoiceNumber || localStorage.getItem('invoiceNumber') || null;
+
+const storedGreeting = localStorage.getItem('customerGreeting');
+if (storedGreeting) {
+  document.getElementById('greeting').innerText = storedGreeting;
+}
+// document.getElementById('greeting').innerText = translations[currentLanguage].defaultGreeting;
+
+if ((urlCustomerNumber || urlInvoiceNumber) && !storedGreeting) {
+  fetch('http://localhost:8000/customer_name', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      customer_number: urlCustomerNumber,
+      invoice_number: urlInvoiceNumber,
+      language: currentLanguage
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.customer_greeting) {
+      const greeting = translations[currentLanguage].greeting(data.customer_greeting);
+      document.getElementById('greeting').innerText = greeting;
+      localStorage.setItem('customerGreeting', greeting);
+    }
+  })
+  .catch(err => console.error('Greeting fetch error:', err));
+}
+
 let chatStarted = false;
 let conversationContext = [];
 
@@ -41,7 +69,8 @@ const translations = {
     error: 'Something went wrong. Please try again.',
     selectInvoice: 'Please select an invoice:',
     thanksFeedback: 'Thanks for your feedback! 😊',
-    sorryFeedback: 'Sorry I couldn\'t help better. 😔'
+    sorryFeedback: 'Sorry I couldn\'t help better. 😔',
+    defaultGreeting: 'Billing chaos? Don’t worry. KlarBill makes it clear.'
   },
   de: {
     prompts: [
@@ -57,9 +86,12 @@ const translations = {
     error: 'Etwas ist schiefgelaufen. Bitte versuche es erneut.',
     selectInvoice: 'Bitte wähle eine Rechnung:',
     thanksFeedback: 'Danke für dein Feedback! 😊',
-    sorryFeedback: 'Entschuldigung, dass ich nicht besser helfen konnte. 😔'
+    sorryFeedback: 'Entschuldigung, dass ich nicht besser helfen konnte. 😔',
+    defaultGreeting: 'Abrechnungschaos? Keine Sorge. KlarBill macht es klar.'
   }
 };
+
+document.getElementById('greeting').innerText = translations[currentLanguage].defaultGreeting;
 
 function updateLanguageUI() {
   currentLanguage = languageToggle.checked ? 'de' : 'en';

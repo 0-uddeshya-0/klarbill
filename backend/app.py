@@ -3,11 +3,18 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Dict, Any, Optional
 from agentic_llm_service import AgenticUtilityBillLLM  # Updated import
+from data.upload_invoices import upload_invoices_once
 import uvicorn
 import requests
 from fastapi.middleware.cors import CORSMiddleware
 import time
 import re
+
+# Ensure .env config and environment variables are loaded at startup
+from config import ensure_config
+
+ensure_config()
+upload_invoices_once()
 
 app = FastAPI(title="KlarBill Agentic AI API", version="2.0.0")
 
@@ -139,6 +146,61 @@ async def log_message(request: LogMessageRequest):
         print(f"Logging error: {e}")
         # Return success even if logging fails to not disrupt user experience
         return {"status": "partial_success", "logged": False, "message": "Message processed but logging failed"}
+
+class NameRequest(BaseModel):
+    customer_number: Optional[str] = None
+    invoice_number: Optional[str] = None
+    language: str = 'en'
+
+from data.firebase_service import get_invoice_by_number, get_invoices_by_customer
+
+@app.post("/customer_name")
+async def customer_name(request: NameRequest):
+    """Return localized greeting based on customer or invoice number"""
+    try:
+        invoice = None
+        if request.invoice_number:
+            invoice_entry = get_invoice_by_number(request.invoice_number)
+            invoice = list(invoice_entry.values())[0] if invoice_entry else None
+        elif request.customer_number:
+            invoice_entries = get_invoices_by_customer(request.customer_number)
+            invoice = list(invoice_entries.values())[0] if invoice_entries else None
+
+        if not invoice:
+            return {"customer_greeting": ""}
+
+        data = invoice.get("Data", {})
+        pro_daten = data.get("ProzessDaten", {})
+        prozess_element = pro_daten.get("ProzessDatenElement", {})
+
+        if isinstance(prozess_element, list):
+            process_data = prozess_element[0] if prozess_element else {}
+        else:
+            process_data = prozess_element
+
+        business_partner = process_data.get("Geschaeftspartner", {}).get("GeschaeftspartnerElement", {})
+        name = business_partner.get("name", "")
+        salutation = business_partner.get("salutation", "")
+
+        if not name:
+            return {"customer_greeting": ""}
+
+        if request.language == "de":
+            greeting = f"{salutation} {name}!"
+        else:
+            if salutation.lower() == "frau":
+                salutation_translated = "Ms."
+            elif salutation.lower() == "herr":
+                salutation_translated = "Mr."
+            else:
+                salutation_translated = salutation
+            greeting = f"{salutation_translated} {name}!"
+
+        return {"customer_greeting": greeting}
+
+    except Exception as e:
+        print(f"Greeting fetch error: {e}")
+        return {"customer_greeting": ""}
 
 @app.get("/health")
 async def health_check():
