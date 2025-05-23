@@ -9,6 +9,7 @@ import json
 from datetime import datetime, timedelta
 from dataclasses import dataclass
 from enum import Enum
+from data.firebase_service import get_db_reference
 
 FIREBASE_INVOICES_URL = "https://klarbill-3de73-default-rtdb.europe-west1.firebasedatabase.app/invoices.json"
 
@@ -82,11 +83,8 @@ class GermanEnergyRegulations:
 
 def fetch_invoice_data(customer_number=None, invoice_number=None) -> Tuple[bool, Dict[str, Any]]:
     try:
-        response = requests.get(FIREBASE_INVOICES_URL)
-        if response.status_code != 200:
-            return False, {}
-
-        data = response.json()
+        ref = get_db_reference("invoices")
+        data = ref.get()
         if not isinstance(data, dict):
             return False, {}
 

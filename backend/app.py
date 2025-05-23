@@ -159,15 +159,23 @@ async def customer_name(request: NameRequest):
     """Return localized greeting based on customer or invoice number"""
     try:
         invoice = None
+        match_type = None
+
+        # 1. Try invoice_number first
         if request.invoice_number:
             invoice_entry = get_invoice_by_number(request.invoice_number)
-            invoice = list(invoice_entry.values())[0] if invoice_entry else None
-        elif request.customer_number:
+            if invoice_entry:
+                invoice = list(invoice_entry.values())[0]
+                match_type = "invoice"
+        # 2. If not found, try customer_number
+        if not invoice and request.customer_number:
             invoice_entries = get_invoices_by_customer(request.customer_number)
-            invoice = list(invoice_entries.values())[0] if invoice_entries else None
+            if invoice_entries:
+                invoice = list(invoice_entries.values())[0]
+                match_type = "customer"
 
         if not invoice:
-            return {"customer_greeting": ""}
+            return {"customer_greeting": "", "type": ""}
 
         data = invoice.get("Data", {})
         pro_daten = data.get("ProzessDaten", {})
@@ -183,7 +191,7 @@ async def customer_name(request: NameRequest):
         salutation = business_partner.get("salutation", "")
 
         if not name:
-            return {"customer_greeting": ""}
+            return {"customer_greeting": "", "type": ""}
 
         if request.language == "de":
             greeting = f"{salutation} {name}!"
@@ -196,11 +204,11 @@ async def customer_name(request: NameRequest):
                 salutation_translated = salutation
             greeting = f"{salutation_translated} {name}!"
 
-        return {"customer_greeting": greeting}
+        return {"customer_greeting": greeting, "type": match_type or ""}
 
     except Exception as e:
         print(f"Greeting fetch error: {e}")
-        return {"customer_greeting": ""}
+        return {"customer_greeting": "", "type": ""}
 
 @app.get("/health")
 async def health_check():

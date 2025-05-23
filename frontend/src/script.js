@@ -201,25 +201,63 @@ function askForIdentifier() {
     </div>
   `;
   messageList.appendChild(div);
-  
+
   const inputEl = div.querySelector('#customer-number-input');
   const btn = div.querySelector('#submit-number-btn');
-  
   inputEl.focus();
-  
-  const submitNumber = () => {
-    const val = inputEl.value.trim();
-    if (val) {
-      sendMessage(val);
-      div.remove();
+
+  async function processIdentifier(val) {
+    // Save for possible later use
+    localStorage.setItem('identifier', val);
+    localStorage.removeItem('customerNumber');
+    localStorage.removeItem('invoiceNumber');
+    localStorage.removeItem('customerGreeting');
+
+    // Always send both fields, backend decides which it is
+    const payload = {
+      customer_number: val,
+      invoice_number: val,
+      language: currentLanguage
+    };
+
+    try {
+      const res = await fetch(`${BACKEND_BASE_URL}/customer_name`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (data.type === "invoice") {
+        localStorage.setItem('invoiceNumber', val);
+        localStorage.removeItem('customerNumber');
+      } else if (data.type === "customer") {
+        localStorage.setItem('customerNumber', val);
+        localStorage.removeItem('invoiceNumber');
+      }
+      if (data.customer_greeting) {
+        const greeting = translations[currentLanguage].greeting(data.customer_greeting);
+        document.getElementById('greeting').innerText = greeting;
+        localStorage.setItem('customerGreeting', greeting);
+      }
+    } catch (err) {
+      console.error('Greeting fetch error:', err);
     }
+
+    div.remove();
+    renderPrompts();
+    input.focus();
+  }
+
+  btn.onclick = () => {
+    const val = inputEl.value.trim();
+    if (val) processIdentifier(val);
   };
-  
-  btn.onclick = submitNumber;
-  input.addEventListener('keydown', (e) => {
+
+  inputEl.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      sendBtn.click();
+      const val = inputEl.value.trim();
+      if (val) processIdentifier(val);
     }
   });
 }
