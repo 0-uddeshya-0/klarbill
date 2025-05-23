@@ -1,5 +1,11 @@
 // script.js - Enhanced for Agentic AI Integration
 
+function clearSessionData() {
+  localStorage.removeItem('customerNumber');
+  localStorage.removeItem('invoiceNumber');
+  localStorage.removeItem('customerGreeting');
+}
+
 const toggle = document.getElementById('theme-toggle');
 const languageToggle = document.getElementById('language-toggle');
 const promptList = document.getElementById('prompt-list');
@@ -12,6 +18,15 @@ const BACKEND_BASE_URL = 'http://localhost:8000';
 const urlParams = new URLSearchParams(window.location.search);
 const urlCustomerNumber = urlParams.get('customernumber');
 const urlInvoiceNumber = urlParams.get('invoicenumber');
+
+// Clear session data if neither URL param is present (avoid stale session reuse)
+if (!urlCustomerNumber && !urlInvoiceNumber) {
+  clearSessionData();  // Clear stale session if neither param is present
+}
+
+if (urlCustomerNumber || urlInvoiceNumber) {
+  clearSessionData();  // Clear old session data on new param usage
+}
 
 if (urlCustomerNumber) {
   localStorage.setItem('customerNumber', urlCustomerNumber);
@@ -181,7 +196,7 @@ function askForIdentifier() {
   div.innerHTML = `
     <p>${translations[currentLanguage].askIdentifier}</p>
     <div class="input-container">
-      <input type="text" id="customer-number-input" placeholder="e.g. 10000593 or SWLS0074462025">
+      <input type="text" id="customer-number-input" placeholder="e.g. 10000000 or SWLS007446223">
       <button id="submit-number-btn">Submit</button>
     </div>
   `;
@@ -346,6 +361,7 @@ input.addEventListener('keypress', (e) => {
 
 // Add clear session functionality (for testing)
 if (window.location.search.includes('clear=true')) {
+  clearSessionData();
   localStorage.clear();
   location.reload();
 }

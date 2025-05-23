@@ -90,14 +90,14 @@ def fetch_invoice_data(customer_number=None, invoice_number=None) -> Tuple[bool,
         if not isinstance(data, dict):
             return False, {}
 
-        if invoice_number:
+        if invoice_number and invoice_number.strip():
             filtered = {
                 k: v for k, v in data.items()
                 if v.get("Data", {}).get("ProzessDaten", {}).get("ProzessDatenElement", {}).get("invoiceNumber") == invoice_number
             }
             return bool(filtered), filtered
 
-        if customer_number:
+        if customer_number and customer_number.strip():
             filtered = {
                 k: v for k, v in data.items()
                 if v.get("Data", {}).get("ProzessDaten", {}).get("ProzessDatenElement", {})
@@ -105,7 +105,7 @@ def fetch_invoice_data(customer_number=None, invoice_number=None) -> Tuple[bool,
             }
             return bool(filtered), filtered
 
-        return True, data
+        return False, {}
     except Exception:
         return False, {}
 
@@ -279,8 +279,8 @@ class AgenticUtilityBillLLM:
         
         # Customer information
         partner = analyzer.partner_data
-        salutation = partner.get("salutationText", "Dear Customer")
-        first_name = partner.get("firstName", "")
+        salutation = partner.get("salutation", "Dear Customer")
+        first_name = partner.get("name", "")
         customer_name = f"{first_name} {partner.get('name', '')}".strip()
         
         # Invoice analysis
@@ -411,7 +411,7 @@ COMPONENT BREAKDOWN:
         
         structured_data = {
             "customer_name": analyzer.partner_data.get("firstName", "") + " " + analyzer.partner_data.get("name", ""),
-            "salutation": analyzer.partner_data.get("salutationText", ""),
+            "salutation": analyzer.partner_data.get("salutation", ""),
             "consumption": total_consumption,
             "consumption_period": f"{period_from} to {period_to}",
             "invoice_amount": analyzer.process_data.get("invoiceAmount"),
@@ -447,7 +447,7 @@ if __name__ == "__main__":
         "What's included in the grid charges?"                  # Regulatory explanation
     ]
     
-    customer_number = "10000593"  # From the sample invoice
+    #customer_number = "10000593"  # From the sample invoice
     
     for query in test_queries:
         print(f"\nQuery: {query}")
