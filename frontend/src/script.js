@@ -298,7 +298,7 @@ async function sendMessage(text) {
     // Update greeting with customer info
     if (data.customer_greeting) {
       const greeting = translations[currentLanguage].greeting(data.customer_greeting);
-      document.getElementById('greeting').innerText = greeting;
+      //document.getElementById('greeting').innerText = greeting;
       localStorage.setItem('customerGreeting', greeting);
     }
 
