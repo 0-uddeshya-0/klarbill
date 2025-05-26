@@ -28,7 +28,7 @@
       {
         "input_en": "How do I identify the billing period on my invoice?",
         "input_de": "Wie erkenne ich den Abrechnungszeitraum auf meiner Rechnung?",
-        "response_en": "The billing period appears near the top of your invoice under **'Billing Period'** or **'Accounting Period'**. It shows the start and end dates for the consumption being billed. For annual bills, this typically covers 365 days.",
+        "response_en": "The billing period appears near the top of your invoice under **'Abrechnungszeitraum'** or **'Rechnungsperiode'**. It shows the start and end dates for the consumption being billed. For annual bills, this typically covers 365 days.",
         "response_de": "Der Abrechnungszeitraum steht im oberen Teil Ihrer Rechnung unter **'Abrechnungszeitraum'** oder **'Rechnungsperiode'**. Er zeigt die Start- und Enddaten des abgerechneten Verbrauchs. Bei Jahresrechnungen umfasst dies normalerweise 365 Tage."
       },
       {
@@ -48,12 +48,6 @@
         "input_de": "Was passiert, wenn ich eine Rechnung an eine E-Mail der Bundesnetzagentur sende?",
         "response_en": "Emailed invoices are rejected. Use the Central Invoice Submission Portal (ZRE) with XRechnung format. Non-compliant submissions delay payment processing.",
         "response_de": "Per E-Mail versandte Rechnungen werden abgelehnt. Verwenden Sie das zentrale Rechnungseingangsportal (ZRE) im XRechnung-Format. Nicht konforme Einreichungen verzögern die Zahlungsabwicklung."
-      },
-      {
-        "input_en": "What customer data is listed on my electricity invoice?",
-        "input_de": "Welche Kundendaten sind auf meiner Stromrechnung aufgeführt?",
-        "response_en": "Your electricity invoice includes personal customer data such as your name, address, customer number, and contract account number. This data uniquely identifies your energy supply contract and is used for billing and communication purposes.",
-        "response_de": "Ihre Stromrechnung enthält persönliche Kundendaten wie Ihren Namen, Adresse, Kundennummer und Vertragskontonummer. Diese Daten identifizieren Ihren Energieversorgungsvertrag eindeutig und werden für Abrechnungs- und Kommunikationszwecke verwendet."
       },
       {
         "input_en": "What do the connection data on my invoice mean?",
@@ -94,12 +88,6 @@
     ],
     "consumption": [
       {
-        "input_en": "How was my consumption calculated?",
-        "input_de": "Wie wurde mein Verbrauch berechnet?",
-        "response_en": "Methods: 1) Actual meter reading, 2) Estimated value (historical data/household factors), 3) Self-reported reading. Check **'Determined Consumption'** for details. Dispute estimates by submitting a current reading.",
-        "response_de": "Methoden: 1) Tatsächlicher Zählerstand, 2) Geschätzter Wert (historische Daten/Haushaltsfaktoren), 3) Selbst gemeldeter Zählerstand. Details finden Sie unter **'Festgestellter Verbrauch'**. Schätzungen können Sie durch Vorlage eines aktuellen Zählerstands anfechten."
-      },
-      {
         "input_en": "Why does my invoice show estimated consumption despite my submitting a reading?",
         "input_de": "Warum zeigt meine Rechnung geschätzten Verbrauch, obwohl ich einen Zählerstand gemeldet habe?",
         "response_en": "If your reading was submitted after the billing cutoff date (e.g., Dec 31), the supplier uses the last validated data. Request a corrected invoice under §40a EnWG.",
@@ -108,7 +96,7 @@
       {
         "input_en": "How do I read the consumption comparison graphs?",
         "input_de": "Wie lese ich die Verbrauchsvergleichsdiagramme?",
-        "response_en": "1) **Yearly Comparison**: Current vs. previous year's usage. 2) **Peer Comparison**: Your usage vs. similar households. Graphs use kWh for electricity or m³/kWh for gas.",
+        "response_en": "1) **Jahresvergleich(Yearly Comparison)**: Current vs. previous year's usage. 2) **Haushaltsvergleich(Peer Comparison)**: Your usage vs. similar households. Graphs use kWh for electricity or m³/kWh for gas.",
         "response_de": "1) **Jahresvergleich**: Aktueller Verbrauch im Vergleich zum Vorjahr. 2) **Haushaltsvergleich**: Ihr Verbrauch im Vergleich zu ähnlichen Haushalten. Die Diagramme verwenden kWh für Strom oder m³/kWh für Gas."
       },
       {
@@ -142,9 +130,9 @@
         "response_de": "Ein statistisches Modell, das Ihr Nutzungsverhalten basierend auf dem Haushaltstyp vorhersagt, verwendet wenn Sie keinen Smart Meter haben. Es bestimmt, wann Sie wahrscheinlich Energie im Tages-/Jahresverlauf verbrauchen. Referenziert unter **'Verbrauchsbewertung'** für Kunden ohne Intervallzähler."
       },
       {
-        "input_en": "How can I find my electricity consumption on the invoice?",
+        "input_en": "How/Where can I find my electricity consumption on the invoice?",
         "input_de": "Wie finde ich meinen Stromverbrauch auf der Rechnung?",
-        "response_en": "Your electricity consumption is shown in kilowatt-hours (kWh) and is calculated by subtracting the initial meter reading from the final reading. This section also notes how the readings were obtained (actual, estimated, self-reported).",
+        "response_en": "Your electricity consumption(i.e Stromverbrauch) is shown in kilowatt-hours (kWh) and is calculated by subtracting the initial meter reading from the final reading. This section also notes how the readings were obtained (actual, estimated, self-reported).",
         "response_de": "Ihr Stromverbrauch wird in Kilowattstunden (kWh) angezeigt und durch Subtraktion des Anfangs- vom Endzählerstand berechnet. Dieser Abschnitt vermerkt auch, wie die Zählerstände ermittelt wurden (tatsächlich, geschätzt, selbst gemeldet)."
       },
       {
@@ -160,10 +148,28 @@
         "response_de": "Die Zählernummer identifiziert das spezifische Gerät, das Ihren Verbrauch misst. Das Zählwerk zeigt den numerischen Wert, aus dem Ihr Verbrauch berechnet wird, entsprechend Ihrem Tariftyp oder Nutzungszeitraum."
       },
       {
-        "input_en": "How is the consumption price calculated?",
-        "input_de": "Wie wird der Verbrauchspreis berechnet?",
-        "response_en": "The consumption price is calculated by multiplying the energy consumed (in kWh) by the agreed per-kWh rate in your contract. For example: 3,000 kWh × €0.30/kWh = €900.",
-        "response_de": "Der Verbrauchspreis wird berechnet, indem der verbrauchte Strom (in kWh) mit dem vereinbarten Preis pro kWh in Ihrem Vertrag multipliziert wird. Beispiel: 3.000 kWh × 0,30 €/kWh = 900 €."
+        "input_en": "How is my energy consumption determined?",
+        "input_de": "Wie wird mein Energieverbrauch ermittelt?",
+        "response_en": "Methods under §40a EnWG: 1) Actual meter reading 2) Estimated value (historical data/household factors) 3) Self-reported reading. Smart meter data used if available.",
+        "response_de": "Methoden gemäß §40a EnWG: 1) Tatsächlicher Zählerstand 2) Schätzwert (historische Daten/Haushaltsfaktoren) 3) Selbst gemeldeter Stand. Smart-Meter-Daten werden genutzt, falls verfügbar."
+      },
+      {
+        "input_en": "When can suppliers estimate my consumption?",
+        "input_de": "Wann dürfen Lieferanten meinen Verbrauch schätzen?",
+        "response_en": "Only if: 1) No meter access after reasonable attempts 2) Meter malfunction 3) Missing self-report. Must consider household changes like heat pump installations.",
+        "response_de": "Nur wenn: 1) Kein Zählerzugang trotz Bemühungen 2) Zählerdefekt 3) Fehlende Selbstmeldung. Muss Haushaltsänderungen wie Wärmepumpeninstallation berücksichtigen."
+      },
+      {
+        "input_en": "How is annual consumption calculated for the bill?",
+        "input_de": "Wie wird der Jahresverbrauch für die Rechnung berechnet?",
+        "response_en": "Annual consumption is determined based on actual meter readings, substituted values, or estimates if actual readings are unavailable. This is regulated by §40a EnWG. Accepted methods include:\n- Readings from the meter operator (can be actual or proxy values)\n- Supplier-conducted readings or contracted service providers\n- Customer self-reported readings (if remote reading isn't available)\n\nEstimates are only permitted if:\n- You fail to self-report after a request\n- You do not object due to illness or inability\n- The supplier cannot access the meter due to reasons beyond their control\n\nThe invoice must state the reading method, explain any estimate, and reference influencing factors (e.g., household size, heat pump usage).",
+        "response_de": "Der Jahresverbrauch wird basierend auf tatsächlichen Zählerständen, Ersatzwerten oder Schätzungen ermittelt, wenn keine tatsächlichen Ablesungen verfügbar sind. Dies ist durch §40a EnWG geregelt. Akzeptierte Methoden umfassen:\n- Ablesungen durch den Messstellenbetreiber (können tatsächliche oder Stellvertreterwerte sein)\n- Vom Lieferanten durchgeführte Ablesungen oder beauftragte Dienstleister\n- Vom Kunden selbst gemeldete Ablesungen (falls Fernablesung nicht verfügbar)\n\nSchätzungen sind nur zulässig, wenn:\n- Sie einer Aufforderung zur Selbstablesung nicht nachkommen\n- Sie aus Krankheit oder Unvermögen keinen Widerspruch einlegen\n- Der Lieferant aus von ihm nicht zu vertretenden Gründen keinen Zugang zum Zähler erhält\n\nDie Rechnung muss die Ablesemethode angeben, Schätzungen erläutern und Einflussfaktoren (z.B. Haushaltsgröße, Wärmepumpennutzung) benennen."
+      },
+      {
+        "input_en": "How often does energy consumption have to be billed?",
+        "input_de": "Wie oft muss der Energieverbrauch abgerechnet werden?",
+        "response_en": "Suppliers must bill energy consumption at least annually (§40c EnWG). However, they may offer or agree to more frequent billing (monthly, quarterly, or semi-annually). If billing is monthly and smart meters are used, the customer must receive usage and cost information without additional charges. Invoices must be delivered within three weeks for monthly billing or within six weeks after the end of a billing period or contract termination.",
+        "response_de": "Lieferanten müssen den Energieverbrauch mindestens jährlich abrechnen (§40c EnWG). Sie können jedoch häufigere Abrechnungen (monatlich, vierteljährlich oder halbjährlich) anbieten oder vereinbaren. Bei monatlicher Abrechnung mit Smart Metern muss der Kunde Verbrauchs- und Kosteninformationen ohne zusätzliche Gebühren erhalten. Rechnungen müssen innerhalb von drei Wochen bei monatlicher Abrechnung oder innerhalb von sechs Wochen nach Ende eines Abrechnungszeitraums oder Vertragsende zugestellt werden."
       },
       {
         "input_en": "What does the factor on my invoice mean?",
@@ -184,12 +190,6 @@
         "input_de": "Warum zahle ich eine Offshore-Netzumlage?",
         "response_en": "This funds offshore wind infrastructure. Rate: [Current rate] ct/kWh, per the Energy Industry Act. Exemptions apply for green energy contracts.",
         "response_de": "Diese finanziert Offshore-Windinfrastruktur. Satz: [Aktueller Satz] ct/kWh gemäß Energiewirtschaftsgesetz. Ausnahmen gelten für Ökostromverträge."
-      },
-      {
-        "input_en": "How is the CO2 tax on gas calculated?",
-        "input_de": "Wie wird die CO2-Steuer auf Gas berechnet?",
-        "response_en": "CO2 price = [Consumption in kWh × current rate (e.g., €0.55/ct per kWh)]. Applies until Dec 31, 2025, under the Fuel Emissions Trading Act.",
-        "response_de": "CO2-Preis = [Verbrauch in kWh × aktueller Satz (z.B. 0,55 ct/kWh)]. Gültig bis 31.12.2025 gemäß Brennstoffemissionshandelsgesetz."
       },
       {
         "input_en": "What are the components of my electricity price?",
@@ -334,15 +334,49 @@
       {
         "input_en": "I believe I paid more installments than shown—how can I check?",
         "input_de": "Ich glaube, ich habe mehr Abschläge bezahlt als angegeben – wie kann ich das überprüfen?",
-        "response_en": "Compare your bank statements or payment confirmations with the installment schedule in your annual invoice. Check the section **'Installment Payments Received'**. If discrepancies exist, contact customer service with payment proofs (e.g., transaction dates, amounts).",
+        "response_en": "Compare your bank statements or payment confirmations with the installment schedule in your annual invoice. Check the section **'Erhaltene Abschlagszahlungen(Installment Payments Received)'**. If discrepancies exist, contact customer service with payment proofs (e.g., transaction dates, amounts).",
         "response_de": "Vergleichen Sie Ihre Kontoauszüge oder Zahlungsbestätigungen mit dem Abschlagsplan in Ihrer Jahresrechnung. Überprüfen Sie den Abschnitt **'Erhaltene Abschlagszahlungen'**. Bei Abweichungen wenden Sie sich mit Zahlungsnachweisen (z. B. Überweisungsdaten, Beträge) an den Kundenservice."
+      }
+    ],
+    "payments_credits": [
+      {
+        "input_en": "How are credit balances handled?",
+        "input_de": "Wie werden Guthaben behandelt?",
+        "response_en": "Credits must be either: 1) Fully offset against next payment 2) Paid out within 2 weeks. Basic supply requires immediate payment per §13 StromGVV/GasGVV.",
+        "response_de": "Guthaben müssen entweder: 1) Vollständig mit nächster Zahlung verrechnet oder 2) Innerhalb von 2 Wochen ausgezahlt werden. Grundversorgung erfordert sofortige Auszahlung gemäß §13 StromGVV/GasGVV."
+      },
+      {
+        "input_en": "What if my supplier delays credit repayment?",
+        "input_de": "Was, wenn mein Lieferant die Guthabenrückzahlung verzögert?",
+        "response_en": "Send formal demand via registered mail citing §286 BGB. You may claim default interest (5 percentage points above base rate) after 30 days.",
+        "response_de": "Senden Sie formelle Aufforderung per Einschreiben unter Berufung auf §286 BGB. Nach 30 Tagen können Sie Verzugszinsen (5 Prozentpunkte über Basiszinssatz) verlangen."
+      },
+      {
+        "input_en": "When does a credit balance have to be paid out or offset?",
+        "input_de": "Wann muss ein Guthaben ausgezahlt oder verrechnet werden?",
+        "response_en": "According to §40c EnWG and §13 StromGVV/GasGVV, credit balances must be:\n- Fully offset against the next installment payment, or\n- Paid out within 2 weeks of invoice issuance\n\nFor basic supply customers, immediate payout is required (i.e., no culpable delay). If delayed, customers may:\n- Send a registered demand letter (§286 BGB)\n- Claim default interest and, if applicable, damages\n- Refuse future advance payments under §273 BGB until credit is settled",
+        "response_de": "Gemäß §40c EnWG und §13 StromGVV/GasGVV müssen Guthaben:\n- Vollständig mit der nächsten Abschlagszahlung verrechnet oder\n- Innerhalb von 2 Wochen nach Rechnungsstellung ausgezahlt werden\n\nFür Grundversorgungskunden ist sofortige Auszahlung erforderlich (d.h. kein vertretbarer Verzug). Bei Verzögerung können Kunden:\n- Eine eingeschriebene Aufforderung senden (§286 BGB)\n- Verzugszinsen und ggf. Schadenersatz verlangen\n- Zukünftige Abschlagszahlungen gemäß §273 BGB verweigern, bis das Guthaben ausgeglichen ist"
+      }
+    ],
+    "late_billing": [
+      {
+        "input_en": "What recourse exists for late bills?",
+        "input_de": "Welche Rechtsmittel gibt es bei verspäteten Rechnungen?",
+        "response_en": "1) Set 30-day deadline via registered mail 2) Claim 5% interest after deadline 3) Withhold advance payments under §273 BGB 4) File BNetzA complaint.",
+        "response_de": "1) 30-Tage-Frist per Einschreiben setzen 2) 5% Zinsen nach Frist verlangen 3) Abschlagszahlungen gemäß §273 BGB zurückhalten 4) Beschwerde bei BNetzA einreichen."
+      },
+      {
+        "input_en": "Within what time limit must the supplier prepare an invoice?",
+        "input_de": "Innerhalb welcher Frist muss der Lieferant eine Rechnung erstellen?",
+        "response_en": "Suppliers must send annual or final bills within 6 weeks after the end of the billing period or termination of the contract (§40c EnWG). For monthly billing, invoices must be provided within 3 weeks. Delays may justify default claims:\n- You can set a deadline for invoice issuance (default under §286 BGB)\n- Claim interest or damages if your rights are affected\n- Refuse further advance payments under §273 BGB\n\nNote: Missing the deadline doesn't void the supplier's right to charge for delivered energy.",
+        "response_de": "Lieferanten müssen Jahres- oder Endabrechnungen innerhalb von 6 Wochen nach Ende des Abrechnungszeitraums oder Vertragsende versenden (§40c EnWG). Bei monatlicher Abrechnung müssen Rechnungen innerhalb von 3 Wochen bereitgestellt werden. Verzögerungen können Verzugsansprüche rechtfertigen:\n- Sie können eine Frist für Rechnungserstellung setzen (Verzug gemäß §286 BGB)\n- Zinsen oder Schadenersatz verlangen, wenn Ihre Rechte betroffen sind\n- Weitere Abschlagszahlungen gemäß §273 BGB verweigern\n\nHinweis: Fristüberschreitung entzieht dem Lieferanten nicht das Recht, für gelieferte Energie zu berechnen."
       }
     ],
     "regulatory_changes": [
       {
         "input_en": "Why did my electricity tax increase?",
         "input_de": "Warum ist meine Stromsteuer gestiegen?",
-        "response_en": "Electricity tax rates are set by the Electricity Tax Act. Changes occur due to legislative updates (e.g., 2023 rate: 2.05 ct/kWh). Check the **'Taxes'** section for breakdown.",
+        "response_en": "Electricity tax rates are set by the Electricity Tax Act. Changes occur due to legislative updates (e.g., 2023 rate: 2.05 ct/kWh).",
         "response_de": "Die Stromsteuersätze werden durch das Stromsteuergesetz festgelegt. Änderungen erfolgen aufgrund gesetzlicher Aktualisierungen (z.B. 2023 Satz: 2,05 ct/kWh). Überprüfen Sie den Abschnitt **'Steuern'** für die Aufschlüsselung."
       },
       {
@@ -394,12 +428,6 @@
         "input_de": "Wie überprüfe ich, ob ich im Grundversorgungstarif bin?",
         "response_en": "Look under **'Contract'** for 'Basic Supply' status. Basic supply tariffs have regulated pricing; non-basic tariffs are market-driven.",
         "response_de": "Überprüfen Sie unter **'Vertrag'** den Status 'Grundversorgung'. Grundversorgungstarife haben regulierte Preise; andere Tarife sind marktgetrieben."
-      },
-      {
-        "input_en": "When can I terminate my contract?",
-        "input_de": "Wann kann ich meinen Vertrag kündigen?",
-        "response_en": "Termination is possible from [Next Possible Date] with a [X]-day notice. Check **'Contract Duration'** for exact terms. Early exits may incur fees.",
-        "response_de": "Kündigung ist ab [nächstmögliches Datum] mit [X]-tägiger Frist möglich. Überprüfen Sie **'Vertragslaufzeit'** für genaue Bedingungen. Vorzeitige Beendigung kann Gebühren nach sich ziehen."
       },
       {
         "input_en": "What is the difference between special contract and basic supply?",
@@ -458,6 +486,18 @@
         "response_de": "1) Aktuellen Zählerstand einreichen. 2) Schriftlich korrigierte Rechnung anfordern. 3) §40a EnWG zitieren (Schätzregeln). 4) Bei Nichtlösung an die Bundesnetzagentur eskalieren."
       },
       {
+        "input_en": "How to formally dispute a bill?",
+        "input_de": "Wie bestreite ich formell eine Rechnung?",
+        "response_en": "1) Submit written objection with meter evidence 2) Request corrected invoice 3) Cite §40a EnWG. Continue payments to avoid disconnection risks.",
+        "response_de": "1) Schriftlichen Widerspruch mit Zählernachweisen einreichen 2) Korrigierte Rechnung anfordern 3) §40a EnWG zitieren. Zahlungen fortsetzen, um Sperrrisiko zu vermeiden."
+      },
+      {
+        "input_en": "Can I withhold payment during disputes?",
+        "input_de": "Kann ich während eines Streits Zahlungen zurückhalten?",
+        "response_en": "Yes under §273 BGB if: 1) Formal dispute filed 2) Evidence provided 3) Supplier notified. Must maintain partial payments for undisputed amounts.",
+        "response_de": "Ja gemäß §273 BGB, wenn: 1) Formeller Widerspruch eingereicht 2) Nachweise vorgelegt 3) Lieferant benachrichtigt. Muss Teilzahlungen für unbestrittene Beträge leisten."
+      },
+      {
         "input_en": "What if my supplier threatens disconnection over a disputed bill?",
         "input_de": "Was tun, wenn mein Lieferant wegen einer strittigen Rechnung die Sperrung androht?",
         "response_en": "Submit a formal objection citing §273 BGB (right to withhold payment during disputes). Contact the Consumer Service at [Federal Network Agency hotline] for immediate assistance.",
@@ -502,24 +542,6 @@
     ],
     "calculations_examples": [
       {
-        "input_en": "How is my annual consumption projected?",
-        "input_de": "Wie wird mein Jahresverbrauch prognostiziert?",
-        "response_en": "Projection = (Last year's usage × adjustment factor) ± recent trends (e.g., new appliances). For gas: Includes heating degree days. Detailed formula under **'Consumption Forecast'**.",
-        "response_de": "Prognose = (Vorjahresverbrauch × Anpassungsfaktor) ± aktuelle Trends (z.B. neue Geräte). Bei Gas: Inklusive Heizgradtage. Detaillierte Formel unter **'Verbrauchsprognose'**."
-      },
-      {
-        "input_en": "Can you show a gas-to-kWh calculation example?",
-        "input_de": "Können Sie ein Beispiel für die Umrechnung von Gas m³ in kWh zeigen?",
-        "response_en": "Example: 500 m³ × 10.5 kWh/m³ (calorific value) × 0.95 (state number) = 4,987.5 kWh. Values are supplier-specific.",
-        "response_de": "Beispiel: 500 m³ × 10,5 kWh/m³ (Brennwert) × 0,95 (Zustandszahl) = 4.987,5 kWh. Werte sind anbieterspezifisch."
-      },
-      {
-        "input_en": "How is my electricity bill calculated step by step?",
-        "input_de": "Wie wird meine Stromrechnung Schritt für Schritt berechnet?",
-        "response_en": "1) Basic price: €9.95/month × 12 months = €119.40. 2) Consumption: 3,500 kWh × 30.5 ct/kWh = €1,067.50. 3) Subtotal: €1,186.90. 4) Minus advance payments: €1,186.90 - (12 × €100) = €-13.10 (credit). Actual rates from your **'Price Components'** section.",
-        "response_de": "1) Grundpreis: 9,95 €/Monat × 12 Monate = 119,40 €. 2) Verbrauch: 3.500 kWh × 30,5 ct/kWh = 1.067,50 €. 3) Zwischensumme: 1.186,90 €. 4) Abzüglich Abschlagszahlungen: 1.186,90 € - (12 × 100 €) = -13,10 € (Guthaben). Tatsächliche Sätze aus Ihrem Abschnitt **'Preiskomponenten'**."
-      },
-      {
         "input_en": "How do I calculate the percentage increase in my energy price?",
         "input_de": "Wie berechne ich die prozentuale Erhöhung meines Energiepreises?",
         "response_en": "For total cost increase: [(New total cost - Old total cost) ÷ Old total cost] × 100%. For working price: [(New ct/kWh - Old ct/kWh) ÷ Old ct/kWh] × 100%. Example: (35 ct/kWh - 30 ct/kWh) ÷ 30 ct/kWh × 100% = 16.7% increase.",
@@ -542,12 +564,6 @@
         "input_de": "Wie berechnen Lieferanten geschätzte Zählerstände?",
         "response_en": "Formula: Last reading + [Daily average consumption × Days since last reading]. Daily average from: 1) Your historical usage, 2) Similar household profiles, or 3) Standard load profiles. Example: 50,000 kWh + (15 kWh/day × 30 days) = 50,450 kWh estimated reading.",
         "response_de": "Formel: Letzter Stand + [Tagesdurchschnittsverbrauch × Tage seit letztem Stand]. Tagesdurchschnitt aus: 1) Ihrem historischen Verbrauch, 2) Ähnlichen Haushaltsprofilen oder 3) Standardlastprofilen. Beispiel: 50.000 kWh + (15 kWh/Tag × 30 Tage) = 50.450 kWh geschätzter Stand."
-      },
-      {
-        "input_en": "How do I verify the CO2 tax calculation on my gas bill?",
-        "input_de": "Wie überprüfe ich die CO2-Steuerberechnung auf meiner Gasrechnung?",
-        "response_en": "Verify using: Consumption (kWh) × current CO2 tax rate. For 2024, the rate is 45€/tCO2, equivalent to approx. 0.915 ct/kWh for natural gas. Example: 20,000 kWh × 0.915 ct/kWh = €183 CO2 tax. Check **'Statutory Levies'** section.",
-        "response_de": "Überprüfung mit: Verbrauch (kWh) × aktueller CO2-Steuersatz. Für 2024 beträgt der Satz 45€/tCO2, entspricht ca. 0,915 ct/kWh für Erdgas. Beispiel: 20.000 kWh × 0,915 ct/kWh = 183 € CO2-Steuer. Überprüfen Sie den Abschnitt **'Gesetzliche Umlagen'**."
       }
     ],
     "bonuses_discounts": [
@@ -716,12 +732,6 @@
         "input_de": "Was ist mein Energiemix und Umweltauswirkung?",
         "response_en": "The **'Energy Source Disclosure'** section shows your electricity's origin by percentage (coal, nuclear, renewables, etc.) and resulting CO2 emissions/radioactive waste per kWh. This mandatory disclosure under §42 EnWG enables comparison with the national average.",
         "response_de": "Der Abschnitt **'Stromkennzeichnung'** zeigt die Herkunft Ihres Stroms in Prozent (Kohle, Atom, Erneuerbare etc.) und die daraus resultierenden CO2-Emissionen/radioaktiven Abfälle pro kWh. Diese Pflichtangabe gemäß §42 EnWG ermöglicht den Vergleich mit dem nationalen Durchschnitt."
-      },
-      {
-        "input_en": "Who can I contact if I have questions about my invoice?",
-        "input_de": "Wen kann ich kontaktieren, wenn ich Fragen zu meiner Rechnung habe?",
-        "response_en": "For invoice-related questions, contact your energy supplier's customer service. The service hotline is printed at the top or bottom of the invoice. You can also email or access your account via the online portal.",
-        "response_de": "Bei Rechnungsfragen wenden Sie sich an den Kundenservice Ihres Energieversorgers. Die Servicenummer steht oben oder unten auf der Rechnung. Sie können auch eine E-Mail senden oder Ihr Konto über das Online-Portal aufrufen."
       }
     ],
     "energy_efficiency": [
@@ -798,44 +808,6 @@
         "input_de": "Wie wirkt sich mein Ökotarif auf die erneuerbare Energien-Umlage aus?",
         "response_en": "Choosing a green tariff doesn't exempt you from the renewable energy surcharge, as this is a system-wide funding mechanism. However, the EEG surcharge is currently set to zero (since July 2022) and is funded through the federal budget rather than electricity bills.",
         "response_de": "Ein Ökotarif befreit Sie nicht von der EEG-Umlage, da dies ein systemweiter Finanzierungsmechanismus ist. Allerdings ist die EEG-Umlage derzeit auf null gesetzt (seit Juli 2022) und wird über den Bundeshaushalt statt über Stromrechnungen finanziert."
-      }
-    ],
-    "digital_billing_services": [
-      {
-        "input_en": "How do I activate paperless billing?",
-        "input_de": "Wie aktiviere ich die papierlose Abrechnung?",
-        "response_en": "Activate through: 1) Online customer portal (under 'Account Settings'), 2) Supplier's mobile app, 3) Customer service request, or 4) Checking the appropriate box on your annual return form. Suppliers typically offer €5-15 annual discount for paperless billing under **'Digital Services'**.",
-        "response_de": "Aktivierung über: 1) Online-Kundenportal (unter 'Kontoeinstellungen'), 2) Lieferanten-App, 3) Kundenservice-Anfrage oder 4) Ankreuzen der entsprechenden Box auf Ihrer Jahresabrechnung. Anbieter gewähren typischerweise 5-15 € jährlichen Rabatt für papierlose Abrechnung unter **'Digitale Services'**."
-      },
-      {
-        "input_en": "What are the legal requirements for electronic invoices?",
-        "input_de": "Welche rechtlichen Anforderungen gelten für elektronische Rechnungen?",
-        "response_en": "Electronic invoices must meet the same requirements as paper bills under §40 EnWG. Additionally, they require: 1) Your explicit consent, 2) Secure access protection, 3) Downloadable/printable format, 4) Minimum 24-month availability online. Withdrawal from e-billing must be possible at any time.",
-        "response_de": "E-Rechnungen müssen gemäß §40 EnWG denselben Anforderungen wie Papierrechnungen genügen. Zusätzlich benötigen sie: 1) Ihre ausdrückliche Zustimmung, 2) Geschützten Zugang, 3) Herunterladbares/druckbares Format, 4) Mindestens 24-monatige Online-Verfügbarkeit. Widerruf der E-Rechnung muss jederzeit möglich sein."
-      },
-      {
-        "input_en": "How do I submit meter readings electronically?",
-        "input_de": "Wie übermittle ich Zählerstände elektronisch?",
-        "response_en": "Submit through: 1) Supplier's website (customer portal), 2) Mobile app with photo verification, 3) SMS to the service number on your bill, or 4) QR code scan on the meter reading card. Include customer and meter numbers. Submission deadline is typically 7-14 days after receiving the request.",
-        "response_de": "Übermittlung über: 1) Lieferanten-Website (Kundenportal), 2) App mit Fotobestätigung, 3) SMS an Servicenummer auf Ihrer Rechnung oder 4) QR-Code-Scan auf der Ablesekarte. Geben Sie Kundennummer und Zählernummer an. Abgabefrist beträgt typischerweise 7-14 Tage nach Erhalt der Aufforderung."
-      },
-      {
-        "input_en": "What digital tools help me analyze my energy consumption?",
-        "input_de": "Welche digitalen Tools helfen mir, meinen Energieverbrauch zu analysieren?",
-        "response_en": "Modern suppliers offer: 1) Consumption visualization tools in customer portals, 2) Mobile apps with usage alerts, 3) Smart meter dashboards with real-time data, 4) Comparative analytics against previous periods, 5) Energy-saving simulators. Access via the **'Digital Services'** section on your invoice.",
-        "response_de": "Moderne Anbieter bieten: 1) Verbrauchsvisualisierung im Kundenportal, 2) Apps mit Verbrauchswarnungen, 3) Smart-Meter-Dashboards mit Echtzeitdaten, 4) Vergleichsanalysen mit Vorperioden, 5) Energiespar-Simulatoren. Zugriff über den Abschnitt **'Digitale Services'** auf Ihrer Rechnung."
-      },
-      {
-        "input_en": "What security features should electronic energy bills have?",
-        "input_de": "Welche Sicherheitsmerkmale sollten elektronische Energierechnungen haben?",
-        "response_en": "Secure e-bills require: 1) Password-protected customer portal, 2) Data encryption (TLS/SSL), 3) Two-factor authentication for payment changes, 4) Qualified electronic signatures for legal validity, 5) Compliance with GDPR for data protection. Verify these features in your supplier's privacy policy.",
-        "response_de": "Sichere E-Rechnungen benötigen: 1) Passwortgeschütztes Kundenportal, 2) Datenverschlüsselung (TLS/SSL), 3) Zwei-Faktor-Authentifizierung für Zahlungsänderungen, 4) Qualifizierte elektronische Signaturen für Rechtsgültigkeit, 5) DSGVO-Konformität für Datenschutz. Überprüfen Sie diese Merkmale in der Datenschutzerklärung Ihres Lieferanten."
-      },
-      {
-        "input_en": "How long are my electronic bills stored online?",
-        "input_de": "Wie lange werden meine elektronischen Rechnungen online gespeichert?",
-        "response_en": "Suppliers must store electronic invoices for at least 24 months in your customer portal under common industry practice. For tax purposes, personally download and archive bills for 10 years (business customers) or 5 years (private customers) per German tax law requirements.",
-        "response_de": "Lieferanten müssen E-Rechnungen gemäß Branchenstandard mindestens 24 Monate in Ihrem Kundenportal speichern. Für Steuerzwecke laden Sie Rechnungen persönlich herunter und archivieren sie 10 Jahre (Geschäftskunden) oder 5 Jahre (Privatkunden) gemäß deutschen Steuervorschriften."
       }
     ],
     "taxes_and_vat": [
@@ -940,20 +912,6 @@
         "response_de": "Sondertarife mit zeitvariabler Preisgestaltung. Obligatorische Netzverträglichkeitsprüfungen. Streitbeilegung über technisches Compliance-Büro der BNetzA."
       }
     ],
-    "e_invoicing": [
-      {
-        "input_en": "What's the Buyer Reference (Leitweg-ID) format?",
-        "input_de": "Welches Format hat die Käuferreferenz (Leitweg-ID)?",
-        "response_en": "20-digit code starting with federal agency identifier (e.g., BNETZAA-). Found in contract documents. Required in XRechnung BT-10 field.",
-        "response_de": "20-stelliger Code beginnend mit Behördenkennung (z.B. BNETZAA-). In Vertragsunterlagen zu finden. Erforderlich im XRechnung-Feld BT-10."
-      },
-      {
-        "input_en": "How are purchase order numbers handled in legacy contracts?",
-        "input_de": "Wie werden Bestellnummern in Altverträgen behandelt?",
-        "response_en": "Pre-2020 contracts use Auftragsnummer in BT-13 field. Submit contract scan with first e-invoice for verification.",
-        "response_de": "Verträge vor 2020 nutzen Auftragsnummer im BT-13-Feld. Reichen Sie Vertragsscan mit erster E-Rechnung zur Verifizierung ein."
-      }
-    ],
     "dispute_resolution": [
       {
         "input_en": "How long do suppliers have to respond to billing disputes?",
@@ -996,130 +954,6 @@
         "input_de": "Wie hoch ist der gesamte Entlastungsbetrag auf meiner Rechnung?",
         "response_en": "The total relief amount is the cumulative deduction applied over the billing period due to the energy price brake. It's shown clearly in the invoice summary section.",
         "response_de": "Der gesamte Entlastungsbetrag ist die kumulative Reduzierung während des Abrechnungszeitraums aufgrund der Energiepreisbremse. Er wird im Rechnungszusammenfassungsabschnitt klar ausgewiesen."
-      }
-    ]
-  },
-  "energy_billing_qa": {
-    "invoice_content": [
-      {
-        "input_en": "What information must my energy bill contain?",
-        "input_de": "Welche Informationen muss meine Energierechnung enthalten?",
-        "response_en": "Mandatory elements per §40 EnWG: 1) Supplier details 2) Consumption point address 3) Invoice amount 4) Price components 5) Consumption data 6) Contract terms 7) Complaint procedures. Must be explained upon request.",
-        "response_de": "Pflichtangaben gemäß §40 EnWG: 1) Lieferantendetails 2) Verbrauchsortadresse 3) Rechnungsbetrag 4) Preisbestandteile 5) Verbrauchsdaten 6) Vertragsbedingungen 7) Beschwerdeverfahren. Müssen auf Anfrage erläutert werden."
-      }
-    ],
-    "consumption_calculation": [
-      {
-        "input_en": "How is my energy consumption determined?",
-        "input_de": "Wie wird mein Energieverbrauch ermittelt?",
-        "response_en": "Methods under §40a EnWG: 1) Actual meter reading 2) Estimated value (historical data/household factors) 3) Self-reported reading. Smart meter data used if available.",
-        "response_de": "Methoden gemäß §40a EnWG: 1) Tatsächlicher Zählerstand 2) Schätzwert (historische Daten/Haushaltsfaktoren) 3) Selbst gemeldeter Stand. Smart-Meter-Daten werden genutzt, falls verfügbar."
-      },
-      {
-        "input_en": "When can suppliers estimate my consumption?",
-        "input_de": "Wann dürfen Lieferanten meinen Verbrauch schätzen?",
-        "response_en": "Only if: 1) No meter access after reasonable attempts 2) Meter malfunction 3) Missing self-report. Must consider household changes like heat pump installations.",
-        "response_de": "Nur wenn: 1) Kein Zählerzugang trotz Bemühungen 2) Zählerdefekt 3) Fehlende Selbstmeldung. Muss Haushaltsänderungen wie Wärmepumpeninstallation berücksichtigen."
-      },
-      {
-        "input_en": "How is annual consumption calculated for the bill?",
-        "input_de": "Wie wird der Jahresverbrauch für die Rechnung berechnet?",
-        "response_en": "Annual consumption is determined based on actual meter readings, substituted values, or estimates if actual readings are unavailable. This is regulated by §40a EnWG. Accepted methods include:\n- Readings from the meter operator (can be actual or proxy values)\n- Supplier-conducted readings or contracted service providers\n- Customer self-reported readings (if remote reading isn't available)\n\nEstimates are only permitted if:\n- You fail to self-report after a request\n- You do not object due to illness or inability\n- The supplier cannot access the meter due to reasons beyond their control\n\nThe invoice must state the reading method, explain any estimate, and reference influencing factors (e.g., household size, heat pump usage).",
-        "response_de": "Der Jahresverbrauch wird basierend auf tatsächlichen Zählerständen, Ersatzwerten oder Schätzungen ermittelt, wenn keine tatsächlichen Ablesungen verfügbar sind. Dies ist durch §40a EnWG geregelt. Akzeptierte Methoden umfassen:\n- Ablesungen durch den Messstellenbetreiber (können tatsächliche oder Stellvertreterwerte sein)\n- Vom Lieferanten durchgeführte Ablesungen oder beauftragte Dienstleister\n- Vom Kunden selbst gemeldete Ablesungen (falls Fernablesung nicht verfügbar)\n\nSchätzungen sind nur zulässig, wenn:\n- Sie einer Aufforderung zur Selbstablesung nicht nachkommen\n- Sie aus Krankheit oder Unvermögen keinen Widerspruch einlegen\n- Der Lieferant aus von ihm nicht zu vertretenden Gründen keinen Zugang zum Zähler erhält\n\nDie Rechnung muss die Ablesemethode angeben, Schätzungen erläutern und Einflussfaktoren (z.B. Haushaltsgröße, Wärmepumpennutzung) benennen."
-      },
-      {
-        "input_en": "How often does energy consumption have to be billed?",
-        "input_de": "Wie oft muss der Energieverbrauch abgerechnet werden?",
-        "response_en": "Suppliers must bill energy consumption at least annually (§40c EnWG). However, they may offer or agree to more frequent billing (monthly, quarterly, or semi-annually). If billing is monthly and smart meters are used, the customer must receive usage and cost information without additional charges. Invoices must be delivered within three weeks for monthly billing or within six weeks after the end of a billing period or contract termination.",
-        "response_de": "Lieferanten müssen den Energieverbrauch mindestens jährlich abrechnen (§40c EnWG). Sie können jedoch häufigere Abrechnungen (monatlich, vierteljährlich oder halbjährlich) anbieten oder vereinbaren. Bei monatlicher Abrechnung mit Smart Metern muss der Kunde Verbrauchs- und Kosteninformationen ohne zusätzliche Gebühren erhalten. Rechnungen müssen innerhalb von drei Wochen bei monatlicher Abrechnung oder innerhalb von sechs Wochen nach Ende eines Abrechnungszeitraums oder Vertragsende zugestellt werden."
-      }
-    ],
-    "payments_credits": [
-      {
-        "input_en": "How are credit balances handled?",
-        "input_de": "Wie werden Guthaben behandelt?",
-        "response_en": "Credits must be either: 1) Fully offset against next payment 2) Paid out within 2 weeks. Basic supply requires immediate payment per §13 StromGVV/GasGVV.",
-        "response_de": "Guthaben müssen entweder: 1) Vollständig mit nächster Zahlung verrechnet oder 2) Innerhalb von 2 Wochen ausgezahlt werden. Grundversorgung erfordert sofortige Auszahlung gemäß §13 StromGVV/GasGVV."
-      },
-      {
-        "input_en": "What if my supplier delays credit repayment?",
-        "input_de": "Was, wenn mein Lieferant die Guthabenrückzahlung verzögert?",
-        "response_en": "Send formal demand via registered mail citing §286 BGB. You may claim default interest (5 percentage points above base rate) after 30 days.",
-        "response_de": "Senden Sie formelle Aufforderung per Einschreiben unter Berufung auf §286 BGB. Nach 30 Tagen können Sie Verzugszinsen (5 Prozentpunkte über Basiszinssatz) verlangen."
-      },
-      {
-        "input_en": "When does a credit balance have to be paid out or offset?",
-        "input_de": "Wann muss ein Guthaben ausgezahlt oder verrechnet werden?",
-        "response_en": "According to §40c EnWG and §13 StromGVV/GasGVV, credit balances must be:\n- Fully offset against the next installment payment, or\n- Paid out within 2 weeks of invoice issuance\n\nFor basic supply customers, immediate payout is required (i.e., no culpable delay). If delayed, customers may:\n- Send a registered demand letter (§286 BGB)\n- Claim default interest and, if applicable, damages\n- Refuse future advance payments under §273 BGB until credit is settled",
-        "response_de": "Gemäß §40c EnWG und §13 StromGVV/GasGVV müssen Guthaben:\n- Vollständig mit der nächsten Abschlagszahlung verrechnet oder\n- Innerhalb von 2 Wochen nach Rechnungsstellung ausgezahlt werden\n\nFür Grundversorgungskunden ist sofortige Auszahlung erforderlich (d.h. kein vertretbarer Verzug). Bei Verzögerung können Kunden:\n- Eine eingeschriebene Aufforderung senden (§286 BGB)\n- Verzugszinsen und ggf. Schadenersatz verlangen\n- Zukünftige Abschlagszahlungen gemäß §273 BGB verweigern, bis das Guthaben ausgeglichen ist"
-      }
-    ],
-    "billing_disputes": [
-      {
-        "input_en": "How to formally dispute a bill?",
-        "input_de": "Wie bestreite ich formell eine Rechnung?",
-        "response_en": "1) Submit written objection with meter evidence 2) Request corrected invoice 3) Cite §40a EnWG. Continue payments to avoid disconnection risks.",
-        "response_de": "1) Schriftlichen Widerspruch mit Zählernachweisen einreichen 2) Korrigierte Rechnung anfordern 3) §40a EnWG zitieren. Zahlungen fortsetzen, um Sperrrisiko zu vermeiden."
-      },
-      {
-        "input_en": "Can I withhold payment during disputes?",
-        "input_de": "Kann ich während eines Streits Zahlungen zurückhalten?",
-        "response_en": "Yes under §273 BGB if: 1) Formal dispute filed 2) Evidence provided 3) Supplier notified. Must maintain partial payments for undisputed amounts.",
-        "response_de": "Ja gemäß §273 BGB, wenn: 1) Formeller Widerspruch eingereicht 2) Nachweise vorgelegt 3) Lieferant benachrichtigt. Muss Teilzahlungen für unbestrittene Beträge leisten."
-      }
-    ],
-    "meter_access": [
-      {
-        "input_en": "Can I refuse meter reading access?",
-        "input_de": "Kann ich den Zugang zur Zählerablesung verweigern?",
-        "response_en": "Only with valid reason (e.g., severe illness). Must provide medical certificate. Supplier bears alternate reading costs per §40a EnWG.",
-        "response_de": "Nur mit triftigem Grund (z.B. schwere Erkrankung). Muss ärztliches Attest vorlegen. Lieferant trägt Kosten für Ersatzablesung gemäß §40a EnWG."
-      }
-    ],
-    "basic_supply": [
-      {
-        "input_en": "How are basic supply credits handled?",
-        "input_de": "Wie werden Guthaben in der Grundversorgung behandelt?",
-        "response_en": "Grundversorgung requires immediate credit offset per §13 StromGVV/GasGVV. Must appear on next bill or be paid within 14 days.",
-        "response_de": "Grundversorgung erfordert sofortige Guthabenverrechnung gemäß §13 StromGVV/GasGVV. Muss auf nächster Rechnung erscheinen oder innerhalb von 14 Tagen ausgezahlt werden."
-      }
-    ],
-    "late_billing": [
-      {
-        "input_en": "What recourse exists for late bills?",
-        "input_de": "Welche Rechtsmittel gibt es bei verspäteten Rechnungen?",
-        "response_en": "1) Set 30-day deadline via registered mail 2) Claim 5% interest after deadline 3) Withhold advance payments under §273 BGB 4) File BNetzA complaint.",
-        "response_de": "1) 30-Tage-Frist per Einschreiben setzen 2) 5% Zinsen nach Frist verlangen 3) Abschlagszahlungen gemäß §273 BGB zurückhalten 4) Beschwerde bei BNetzA einreichen."
-      },
-      {
-        "input_en": "Within what time limit must the supplier prepare an invoice?",
-        "input_de": "Innerhalb welcher Frist muss der Lieferant eine Rechnung erstellen?",
-        "response_en": "Suppliers must send annual or final bills within 6 weeks after the end of the billing period or termination of the contract (§40c EnWG). For monthly billing, invoices must be provided within 3 weeks. Delays may justify default claims:\n- You can set a deadline for invoice issuance (default under §286 BGB)\n- Claim interest or damages if your rights are affected\n- Refuse further advance payments under §273 BGB\n\nNote: Missing the deadline doesn't void the supplier's right to charge for delivered energy.",
-        "response_de": "Lieferanten müssen Jahres- oder Endabrechnungen innerhalb von 6 Wochen nach Ende des Abrechnungszeitraums oder Vertragsende versenden (§40c EnWG). Bei monatlicher Abrechnung müssen Rechnungen innerhalb von 3 Wochen bereitgestellt werden. Verzögerungen können Verzugsansprüche rechtfertigen:\n- Sie können eine Frist für Rechnungserstellung setzen (Verzug gemäß §286 BGB)\n- Zinsen oder Schadenersatz verlangen, wenn Ihre Rechte betroffen sind\n- Weitere Abschlagszahlungen gemäß §273 BGB verweigern\n\nHinweis: Fristüberschreitung entzieht dem Lieferanten nicht das Recht, für gelieferte Energie zu berechnen."
-      }
-    ],
-    "bonus_payments": [
-      {
-        "input_en": "Why wasn't my contract bonus applied?",
-        "input_de": "Warum wurde mein Vertragsbonus nicht angewendet?",
-        "response_en": "Common reasons: 1) Minimum contract period not met 2) Payment delays 3) Terms violation. Check contract clauses. Dispute via registered mail with proof of eligibility.",
-        "response_de": "Häufige Gründe: 1) Mindestvertragslaufzeit nicht erfüllt 2) Zahlungsverzögerungen 3) Vertragsverstoß. Überprüfen Sie Vertragsklauseln. Beanstandung per Einschreiben mit Berechtigungsnachweis."
-      }
-    ],
-    "gas_conversion": [
-      {
-        "input_en": "How is gas converted from m³ to kWh?",
-        "input_de": "Wie wird Gas von m³ in kWh umgerechnet?",
-        "response_en": "Formula: kWh = m³ × Calorific Value × State Number. Values vary monthly - check 'Gas Conversion' section or supplier portal.",
-        "response_de": "Formel: kWh = m³ × Brennwert × Zustandszahl. Werte variieren monatlich - prüfen Sie Abschnitt 'Gasumrechnung' oder Lieferantenportal."
-      }
-    ],
-    "complaint_procedure": [
-      {
-        "input_en": "How to file a formal energy complaint?",
-        "input_de": "Wie reiche ich eine formelle Energiebeschwerde ein?",
-        "response_en": "1) Submit via registered mail with 'Verbraucherbeschwerde nach §111a EnWG' 2) Include meter evidence 3) Demand written response within 4 weeks.",
-        "response_de": "1) Per Einschreiben einreichen mit 'Verbraucherbeschwerde nach §111a EnWG' 2) Zählernachweise beifügen 3) Schriftliche Antwort innerhalb 4 Wochen verlangen."
       }
     ]
   }
