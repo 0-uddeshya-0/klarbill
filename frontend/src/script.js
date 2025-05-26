@@ -293,10 +293,11 @@ async function sendMessage(text) {
   conversationContext.push({ role: 'user', content: text });
   currentCustomerNumber = localStorage.getItem('customerNumber') || null;
   currentInvoiceNumber = localStorage.getItem('invoiceNumber') || null;
-  
+
   appendMessage(text, 'user');
   input.value = '';
-  
+
+
   const typingMsg = appendMessage(translations[currentLanguage].typing, 'assistant', true);
 
   const payload = {
@@ -327,11 +328,26 @@ async function sendMessage(text) {
       currentCustomerNumber = data.session_customer_number;
       localStorage.setItem('customerNumber', currentCustomerNumber);
     }
-    
+
     if (data.session_invoice_number) {
       currentInvoiceNumber = data.session_invoice_number;
       localStorage.setItem('invoiceNumber', currentInvoiceNumber);
     }
+
+    // Always log user message
+    fetch(`${BACKEND_BASE_URL}/log_message`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customer_number: currentCustomerNumber,
+        invoice_number: currentInvoiceNumber,
+        message: text,
+        role: 'user',
+        timestamp: new Date().toISOString(),
+        topic: null,
+        session_id: null
+      })
+    }).catch(err => console.error('User message log error:', err));
 
     // Update greeting with customer info
     if (data.customer_greeting) {
@@ -343,6 +359,22 @@ async function sendMessage(text) {
     // Add assistant response
     conversationContext.push({ role: 'assistant', content: data.response });
     const assistantMsg = appendMessage(data.response, 'assistant');
+
+    // Log assistant message
+    fetch(`${BACKEND_BASE_URL}/log_message`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customer_number: currentCustomerNumber,
+        invoice_number: currentInvoiceNumber,
+        message: data.response,
+        role: 'assistant',
+        timestamp: new Date().toISOString(),
+        topic: null,
+        session_id: null
+      })
+    }).catch(err => console.error('Assistant message log error:', err));
+
     addFeedbackButtons(assistantMsg);
 
     chatStarted = true;
