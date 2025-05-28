@@ -740,6 +740,7 @@
             "cardHolder": null,
             "customerNumber": "20000594",
             "salutationText": "Sehr geehrter Herr Wagner",
+            "dateOfBirth": "1995-11-15",
             "mandateReferenceNumber": "M-10000593-001",
             "outgoingCreditCardType": null,
             "bic": "BYLADEM1001",

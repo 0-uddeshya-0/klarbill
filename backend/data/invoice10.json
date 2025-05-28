@@ -779,6 +779,7 @@
             "cardHolder": "",
             "customerNumber": "10000593",
             "salutationText": "Sehr geehrte Frau Bauer",
+            "dateOfBirth": "1985-07-20",
             "mandateReferenceNumber": "M-10000593-001",
             "outgoingCreditCardType": "",
             "bic": "BYLADEM1001",
