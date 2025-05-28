@@ -9,6 +9,7 @@ import requests
 from fastapi.middleware.cors import CORSMiddleware
 import time
 import re
+from data.firebase_service import get_invoice_by_number, get_invoices_by_customer, get_db_reference
 
 # Ensure .env config and environment variables are loaded at startup
 from config import ensure_config
@@ -17,8 +18,6 @@ ensure_config()
 upload_invoices_once()
 
 app = FastAPI(title="KlarBill Agentic AI API", version="2.0.0")
-
-FIREBASE_BASE_URL = "https://klarbill-3de73-default-rtdb.europe-west1.firebasedatabase.app"
 
 app.add_middleware(
     CORSMiddleware,
@@ -39,7 +38,8 @@ class QueryRequest(BaseModel):
     invoice_number: Optional[str] = None
 
 class LogMessageRequest(BaseModel):
-    customer_number: str
+    customer_number: Optional[str] = None
+    invoice_number: Optional[str] = None
     message: str
     role: str
     timestamp: str
@@ -109,42 +109,34 @@ async def chat_route(request: QueryRequest):
             "error_type": "processing_error"
         }
 
+
 @app.post("/log_message")
 async def log_message(request: LogMessageRequest):
-    """Enhanced message logging with better error handling"""
+    """Log messages directly under invoice or customer path"""
     try:
+        if request.customer_number:
+            path = f"messages/customers/{re.sub(r'[^a-zA-Z0-9_-]', '_', request.customer_number)}"
+        elif request.invoice_number:
+            path = f"messages/invoices/{re.sub(r'[^a-zA-Z0-9_-]', '_', request.invoice_number)}"
+        else:
+            return {"status": "error", "logged": False, "message": "Missing invoice_number or customer_number."}
+
         log_data = {
             'customer_number': request.customer_number,
+            'invoice_number': request.invoice_number,
             'message': request.message,
             'role': request.role,
             'timestamp': request.timestamp,
             'topic': request.topic or 'general',
             'session_id': request.session_id
         }
-        
-        # Sanitize customer number for Firebase path
-        sanitized = re.sub(r'[^a-zA-Z0-9_-]', '_', request.customer_number)
-        log_path = f"{FIREBASE_BASE_URL}/conversations/{sanitized}/messages.json"
-        
-        # Retry logic with exponential backoff
-        for attempt in range(3):
-            try:
-                response = requests.post(log_path, json=log_data, timeout=10)
-                if response.status_code == 200:
-                    return {"status": "success", "logged": True}
-                else:
-                    print(f"Firebase log failed with status {response.status_code}")
-            except requests.exceptions.RequestException as e:
-                print(f"Logging attempt {attempt + 1} failed: {e}")
-                if attempt < 2:  # Don't sleep on last attempt
-                    time.sleep(2 ** attempt)
-        
-        # If all retries failed, don't crash the main functionality
-        return {"status": "partial_success", "logged": False, "message": "Message processed but logging failed"}
-        
+
+        ref = get_db_reference(path)
+        ref.push(log_data)
+        return {"status": "success", "logged": True}
+
     except Exception as e:
         print(f"Logging error: {e}")
-        # Return success even if logging fails to not disrupt user experience
         return {"status": "partial_success", "logged": False, "message": "Message processed but logging failed"}
 
 class NameRequest(BaseModel):
@@ -152,22 +144,28 @@ class NameRequest(BaseModel):
     invoice_number: Optional[str] = None
     language: str = 'en'
 
-from data.firebase_service import get_invoice_by_number, get_invoices_by_customer
-
 @app.post("/customer_name")
 async def customer_name(request: NameRequest):
     """Return localized greeting based on customer or invoice number"""
     try:
         invoice = None
+        match_type = None
+
+        # 1. Try invoice_number first
         if request.invoice_number:
             invoice_entry = get_invoice_by_number(request.invoice_number)
-            invoice = list(invoice_entry.values())[0] if invoice_entry else None
-        elif request.customer_number:
+            if invoice_entry:
+                invoice = list(invoice_entry.values())[0]
+                match_type = "invoice"
+        # 2. If not found, try customer_number
+        if not invoice and request.customer_number:
             invoice_entries = get_invoices_by_customer(request.customer_number)
-            invoice = list(invoice_entries.values())[0] if invoice_entries else None
+            if invoice_entries:
+                invoice = list(invoice_entries.values())[0]
+                match_type = "customer"
 
         if not invoice:
-            return {"customer_greeting": ""}
+            return {"customer_greeting": "", "type": ""}
 
         data = invoice.get("Data", {})
         pro_daten = data.get("ProzessDaten", {})
@@ -183,7 +181,7 @@ async def customer_name(request: NameRequest):
         salutation = business_partner.get("salutation", "")
 
         if not name:
-            return {"customer_greeting": ""}
+            return {"customer_greeting": "", "type": ""}
 
         if request.language == "de":
             greeting = f"{salutation} {name}!"
@@ -196,11 +194,11 @@ async def customer_name(request: NameRequest):
                 salutation_translated = salutation
             greeting = f"{salutation_translated} {name}!"
 
-        return {"customer_greeting": greeting}
+        return {"customer_greeting": greeting, "type": match_type or ""}
 
     except Exception as e:
         print(f"Greeting fetch error: {e}")
-        return {"customer_greeting": ""}
+        return {"customer_greeting": "", "type": ""}
 
 @app.get("/health")
 async def health_check():
@@ -212,8 +210,12 @@ async def health_check():
         # Test Firebase connectivity
         firebase_status = "unknown"
         try:
-            test_response = requests.get(f"{FIREBASE_BASE_URL}/health.json", timeout=5)
-            firebase_status = "healthy" if test_response.status_code == 200 else "issues"
+            try:
+                test_ref = get_db_reference("/health_test_check")
+                _ = test_ref.get()
+                firebase_status = "healthy"
+            except:
+                firebase_status = "unavailable"
         except:
             firebase_status = "unavailable"
             

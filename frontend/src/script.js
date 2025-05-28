@@ -81,7 +81,7 @@ const translations = {
     typing: 'KlarBill is analyzing...',
     askIdentifier: 'Please enter your customer number or invoice number to begin.',
     inputPlaceholder: 'Ask about your energy bill...',
-    greeting: (name) => name ? `Hi ${name}! How can I help?` : 'Hi! How can I help you today?',
+    greeting: (name) => name ? `Hi ${name} How can I help?` : 'Hi! How can I help you today?',
     error: 'Something went wrong. Please try again.',
     selectInvoice: 'Please select an invoice:',
     thanksFeedback: 'Thanks for your feedback! 😊',
@@ -98,7 +98,7 @@ const translations = {
     typing: 'KlarBill analysiert...',
     askIdentifier: 'Bitte gib deine Kunden- oder Rechnungsnummer ein.',
     inputPlaceholder: 'Frage zur Energierechnung...',
-    greeting: (name) => name ? `Hallo ${name}! Wie kann ich helfen?` : 'Hallo! Wie kann ich dir helfen?',
+    greeting: (name) => name ? `Hallo ${name} Wie kann ich helfen?` : 'Hallo! Wie kann ich dir helfen?',
     error: 'Etwas ist schiefgelaufen. Bitte versuche es erneut.',
     selectInvoice: 'Bitte wähle eine Rechnung:',
     thanksFeedback: 'Danke für dein Feedback! 😊',
@@ -201,25 +201,63 @@ function askForIdentifier() {
     </div>
   `;
   messageList.appendChild(div);
-  
+
   const inputEl = div.querySelector('#customer-number-input');
   const btn = div.querySelector('#submit-number-btn');
-  
   inputEl.focus();
-  
-  const submitNumber = () => {
-    const val = inputEl.value.trim();
-    if (val) {
-      sendMessage(val);
-      div.remove();
+
+  async function processIdentifier(val) {
+    // Save for possible later use
+    localStorage.setItem('identifier', val);
+    localStorage.removeItem('customerNumber');
+    localStorage.removeItem('invoiceNumber');
+    localStorage.removeItem('customerGreeting');
+
+    // Always send both fields, backend decides which it is
+    const payload = {
+      customer_number: val,
+      invoice_number: val,
+      language: currentLanguage
+    };
+
+    try {
+      const res = await fetch(`${BACKEND_BASE_URL}/customer_name`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (data.type === "invoice") {
+        localStorage.setItem('invoiceNumber', val);
+        localStorage.removeItem('customerNumber');
+      } else if (data.type === "customer") {
+        localStorage.setItem('customerNumber', val);
+        localStorage.removeItem('invoiceNumber');
+      }
+      if (data.customer_greeting) {
+        const greeting = translations[currentLanguage].greeting(data.customer_greeting);
+        document.getElementById('greeting').innerText = greeting;
+        localStorage.setItem('customerGreeting', greeting);
+      }
+    } catch (err) {
+      console.error('Greeting fetch error:', err);
     }
+
+    div.remove();
+    renderPrompts();
+    input.focus();
+  }
+
+  btn.onclick = () => {
+    const val = inputEl.value.trim();
+    if (val) processIdentifier(val);
   };
-  
-  btn.onclick = submitNumber;
-  input.addEventListener('keydown', (e) => {
+
+  inputEl.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      sendBtn.click();
+      const val = inputEl.value.trim();
+      if (val) processIdentifier(val);
     }
   });
 }
@@ -255,10 +293,11 @@ async function sendMessage(text) {
   conversationContext.push({ role: 'user', content: text });
   currentCustomerNumber = localStorage.getItem('customerNumber') || null;
   currentInvoiceNumber = localStorage.getItem('invoiceNumber') || null;
-  
+
   appendMessage(text, 'user');
   input.value = '';
-  
+
+
   const typingMsg = appendMessage(translations[currentLanguage].typing, 'assistant', true);
 
   const payload = {
@@ -289,22 +328,53 @@ async function sendMessage(text) {
       currentCustomerNumber = data.session_customer_number;
       localStorage.setItem('customerNumber', currentCustomerNumber);
     }
-    
+
     if (data.session_invoice_number) {
       currentInvoiceNumber = data.session_invoice_number;
       localStorage.setItem('invoiceNumber', currentInvoiceNumber);
     }
 
+    // Always log user message
+    fetch(`${BACKEND_BASE_URL}/log_message`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customer_number: currentCustomerNumber,
+        invoice_number: currentInvoiceNumber,
+        message: text,
+        role: 'user',
+        timestamp: new Date().toISOString(),
+        topic: null,
+        session_id: null
+      })
+    }).catch(err => console.error('User message log error:', err));
+
     // Update greeting with customer info
     if (data.customer_greeting) {
       const greeting = translations[currentLanguage].greeting(data.customer_greeting);
-      document.getElementById('greeting').innerText = greeting;
+      //document.getElementById('greeting').innerText = greeting;
       localStorage.setItem('customerGreeting', greeting);
     }
 
     // Add assistant response
     conversationContext.push({ role: 'assistant', content: data.response });
     const assistantMsg = appendMessage(data.response, 'assistant');
+
+    // Log assistant message
+    fetch(`${BACKEND_BASE_URL}/log_message`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customer_number: currentCustomerNumber,
+        invoice_number: currentInvoiceNumber,
+        message: data.response,
+        role: 'assistant',
+        timestamp: new Date().toISOString(),
+        topic: null,
+        session_id: null
+      })
+    }).catch(err => console.error('Assistant message log error:', err));
+
     addFeedbackButtons(assistantMsg);
 
     chatStarted = true;
