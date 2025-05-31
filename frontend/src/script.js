@@ -4,6 +4,7 @@ function clearSessionData() {
   localStorage.removeItem('customerNumber');
   localStorage.removeItem('invoiceNumber');
   localStorage.removeItem('customerGreeting');
+  localStorage.removeItem('validatedIdentifier');
 }
 
 const toggle = document.getElementById('theme-toggle');
@@ -39,36 +40,21 @@ if (urlInvoiceNumber) {
 let currentLanguage = localStorage.getItem('language') || 'en';
 let currentCustomerNumber = urlCustomerNumber || localStorage.getItem('customerNumber') || null;
 let currentInvoiceNumber = urlInvoiceNumber || localStorage.getItem('invoiceNumber') || null;
+let isValidated = localStorage.getItem('validatedIdentifier') === 'true';
 
 const storedGreeting = localStorage.getItem('customerGreeting');
 if (storedGreeting) {
   document.getElementById('greeting').innerText = storedGreeting;
 }
-// document.getElementById('greeting').innerText = translations[currentLanguage].defaultGreeting;
 
 if ((urlCustomerNumber || urlInvoiceNumber) && !storedGreeting) {
-  fetch(`${BACKEND_BASE_URL}/customer_name`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      customer_number: urlCustomerNumber,
-      invoice_number: urlInvoiceNumber,
-      language: currentLanguage
-    })
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.customer_greeting) {
-      const greeting = translations[currentLanguage].greeting(data.customer_greeting);
-      document.getElementById('greeting').innerText = greeting;
-      localStorage.setItem('customerGreeting', greeting);
-    }
-  })
-  .catch(err => console.error('Greeting fetch error:', err));
+  // Validate identifier from URL
+  validateAndSetupSession(urlInvoiceNumber || urlCustomerNumber);
 }
 
 let chatStarted = false;
 let conversationContext = [];
+let inputEnabled = false;
 
 const translations = {
   en: {
@@ -81,12 +67,16 @@ const translations = {
     typing: 'KlarBill is analyzing...',
     askIdentifier: 'Please enter your customer number or invoice number to begin.',
     inputPlaceholder: 'Ask about your energy bill...',
+    inputPlaceholderDisabled: 'Please enter your customer/invoice number first...',
     greeting: (name) => name ? `Hi ${name} How can I help?` : 'Hi! How can I help you today?',
     error: 'Something went wrong. Please try again.',
     selectInvoice: 'Please select an invoice:',
     thanksFeedback: 'Thanks for your feedback! 😊',
     sorryFeedback: 'Sorry I couldn\'t help better. 😔',
-    defaultGreeting: 'Billing chaos? Don’t worry. KlarBill makes it clear.'
+    defaultGreeting: 'Billing chaos? Don\'t worry. KlarBill makes it clear.',
+    validating: 'Validating your information...',
+    invalidIdentifier: 'Invalid customer or invoice number. Please check and try again.',
+    multipleInvoices: 'Multiple invoices found. Please select one:'
   },
   de: {
     prompts: [
@@ -98,21 +88,37 @@ const translations = {
     typing: 'KlarBill analysiert...',
     askIdentifier: 'Bitte gib deine Kunden- oder Rechnungsnummer ein.',
     inputPlaceholder: 'Frage zur Energierechnung...',
+    inputPlaceholderDisabled: 'Bitte zuerst Kunden-/Rechnungsnummer eingeben...',
     greeting: (name) => name ? `Hallo ${name} Wie kann ich helfen?` : 'Hallo! Wie kann ich dir helfen?',
     error: 'Etwas ist schiefgelaufen. Bitte versuche es erneut.',
     selectInvoice: 'Bitte wähle eine Rechnung:',
     thanksFeedback: 'Danke für dein Feedback! 😊',
     sorryFeedback: 'Entschuldigung, dass ich nicht besser helfen konnte. 😔',
-    defaultGreeting: 'Abrechnungschaos? Keine Sorge. KlarBill macht es klar.'
+    defaultGreeting: 'Abrechnungschaos? Keine Sorge. KlarBill macht es klar.',
+    validating: 'Überprüfe deine Informationen...',
+    invalidIdentifier: 'Ungültige Kunden- oder Rechnungsnummer. Bitte überprüfen und erneut versuchen.',
+    multipleInvoices: 'Mehrere Rechnungen gefunden. Bitte wähle eine:'
   }
 };
 
 document.getElementById('greeting').innerText = translations[currentLanguage].defaultGreeting;
 
+function updateInputState() {
+  if (isValidated && (currentCustomerNumber || currentInvoiceNumber)) {
+    input.disabled = false;
+    input.placeholder = translations[currentLanguage].inputPlaceholder;
+    inputEnabled = true;
+  } else {
+    input.disabled = true;
+    input.placeholder = translations[currentLanguage].inputPlaceholderDisabled;
+    inputEnabled = false;
+  }
+}
+
 function updateLanguageUI() {
   currentLanguage = languageToggle.checked ? 'de' : 'en';
   localStorage.setItem('language', currentLanguage);
-  input.placeholder = translations[currentLanguage].inputPlaceholder;
+  updateInputState();
   renderPrompts();
   
   const storedGreeting = localStorage.getItem('customerGreeting');
@@ -121,8 +127,7 @@ function updateLanguageUI() {
   }
 
   // Re-fetch greeting in new language if customer/invoice number exists
-
-  if ((currentCustomerNumber || currentInvoiceNumber)) {
+  if ((currentCustomerNumber || currentInvoiceNumber) && isValidated) {
     fetch(`${BACKEND_BASE_URL}/customer_name`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -145,7 +150,7 @@ function updateLanguageUI() {
 }
 
 function renderPrompts() {
-  if (chatStarted) return;
+  if (chatStarted || !isValidated) return;
   
   promptList.innerHTML = '';
   translations[currentLanguage].prompts.forEach(text => {
@@ -190,13 +195,87 @@ function handleFeedback(container, isPositive) {
     translations[currentLanguage].sorryFeedback;
 }
 
+async function validateAndSetupSession(identifier) {
+  const loadingMsg = appendMessage(translations[currentLanguage].validating, 'assistant');
+  
+  try {
+    const response = await fetch(`${BACKEND_BASE_URL}/validate_identifier`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        identifier: identifier,
+        language: currentLanguage
+      })
+    });
+    
+    const data = await response.json();
+    messageList.removeChild(loadingMsg);
+    
+    if (!data.valid) {
+      appendMessage(translations[currentLanguage].invalidIdentifier, 'assistant error');
+      askForIdentifier();
+      return;
+    }
+    
+    // Valid identifier found
+    if (data.type === 'invoice') {
+      currentInvoiceNumber = identifier;
+      currentCustomerNumber = data.customer_number;
+      localStorage.setItem('invoiceNumber', identifier);
+      localStorage.setItem('customerNumber', data.customer_number);
+    } else if (data.type === 'customer') {
+      currentCustomerNumber = identifier;
+      localStorage.setItem('customerNumber', identifier);
+      
+      // Check if multiple invoices
+      if (data.multiple_invoices && data.invoice_numbers.length > 0) {
+        displayInvoiceSelection(
+          translations[currentLanguage].multipleInvoices, 
+          data.invoice_numbers
+        );
+        return;
+      }
+    }
+    
+    // Set validated flag
+    isValidated = true;
+    localStorage.setItem('validatedIdentifier', 'true');
+    
+    // Update greeting
+    if (data.customer_name) {
+      const salutation = data.salutation;
+      let greeting;
+      if (currentLanguage === 'en') {
+        const salutationEn = salutation.toLowerCase() === 'Frau' ? 'Ms.' : 
+                           salutation.toLowerCase() === 'Herr' ? 'Mr.' : salutation;
+        greeting = translations[currentLanguage].greeting(`${salutationEn} ${data.customer_name}`);
+      } else {
+        greeting = translations[currentLanguage].greeting(`${salutation} ${data.customer_name}`);
+      }
+      document.getElementById('greeting').innerText = greeting;
+      localStorage.setItem('customerGreeting', greeting);
+    }
+    
+    // Enable input and show prompts
+    updateInputState();
+    renderPrompts();
+    input.focus();
+    
+  } catch (error) {
+    console.error('Validation error:', error);
+    messageList.removeChild(loadingMsg);
+    appendMessage(translations[currentLanguage].error, 'assistant error');
+    askForIdentifier();
+  }
+}
+
 function askForIdentifier() {
   const div = document.createElement('div');
   div.className = 'customer-number-prompt';
   div.innerHTML = `
     <p>${translations[currentLanguage].askIdentifier}</p>
     <div class="input-container">
-      <input type="text" id="customer-number-input" placeholder="e.g. 10000000 or SWLS007446223">
+      <input type="text" id="customer-number-input" placeholder="e.g. INV0021 or 10000548">
       <button id="submit-number-btn">Submit</button>
     </div>
   `;
@@ -207,45 +286,8 @@ function askForIdentifier() {
   inputEl.focus();
 
   async function processIdentifier(val) {
-    // Save for possible later use
-    localStorage.setItem('identifier', val);
-    localStorage.removeItem('customerNumber');
-    localStorage.removeItem('invoiceNumber');
-    localStorage.removeItem('customerGreeting');
-
-    // Always send both fields, backend decides which it is
-    const payload = {
-      customer_number: val,
-      invoice_number: val,
-      language: currentLanguage
-    };
-
-    try {
-      const res = await fetch(`${BACKEND_BASE_URL}/customer_name`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      const data = await res.json();
-      if (data.type === "invoice") {
-        localStorage.setItem('invoiceNumber', val);
-        localStorage.removeItem('customerNumber');
-      } else if (data.type === "customer") {
-        localStorage.setItem('customerNumber', val);
-        localStorage.removeItem('invoiceNumber');
-      }
-      if (data.customer_greeting) {
-        const greeting = translations[currentLanguage].greeting(data.customer_greeting);
-        document.getElementById('greeting').innerText = greeting;
-        localStorage.setItem('customerGreeting', greeting);
-      }
-    } catch (err) {
-      console.error('Greeting fetch error:', err);
-    }
-
     div.remove();
-    renderPrompts();
-    input.focus();
+    await validateAndSetupSession(val);
   }
 
   btn.onclick = () => {
@@ -267,37 +309,80 @@ function displayInvoiceSelection(response, suggestions) {
   container.className = 'invoice-selection-container';
   container.innerHTML = `<p>${response}</p>`;
   
-  const buttonsDiv = document.createElement('div');
-  buttonsDiv.className = 'invoice-buttons';
+  const dropdownDiv = document.createElement('div');
+  dropdownDiv.className = 'invoice-dropdown';
   
-  suggestions.forEach(invoiceNum => {
-    const btn = document.createElement('button');
-    btn.className = 'invoice-btn';
-    btn.textContent = invoiceNum;
-    btn.onclick = () => {
-      currentInvoiceNumber = invoiceNum;
-      localStorage.setItem('invoiceNumber', invoiceNum);
-      sendMessage(`Use invoice ${invoiceNum}`);
-      container.remove();
-    };
-    buttonsDiv.appendChild(btn);
+  // Sort suggestions - latest (higher numbers/letters) first
+  const sortedSuggestions = [...suggestions].sort((a, b) => {
+    // Extract numbers from invoice strings for proper numeric sorting
+    const numA = parseInt(a.replace(/\D/g, '')) || 0;
+    const numB = parseInt(b.replace(/\D/g, '')) || 0;
+    return numB - numA; // Descending order (latest first)
   });
   
-  container.appendChild(buttonsDiv);
+  sortedSuggestions.forEach((invoiceNum, index) => {
+    const option = document.createElement('div');
+    option.className = 'invoice-option';
+    option.innerHTML = `
+      <span class="invoice-number">${invoiceNum}</span>
+      <span class="invoice-label">${index === 0 ? '(Latest)' : index === sortedSuggestions.length - 1 ? '(Oldest)' : ''}</span>
+    `;
+    
+    option.onclick = async () => {
+      currentInvoiceNumber = invoiceNum;
+      localStorage.setItem('invoiceNumber', invoiceNum);
+      isValidated = true;
+      localStorage.setItem('validatedIdentifier', 'true');
+      
+      container.remove();
+      
+      // Fetch greeting for the selected invoice
+      try {
+        const response = await fetch(`${BACKEND_BASE_URL}/customer_name`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            invoice_number: invoiceNum,
+            language: currentLanguage
+          })
+        });
+        const data = await response.json();
+        if (data.customer_greeting) {
+          const greeting = translations[currentLanguage].greeting(data.customer_greeting);
+          document.getElementById('greeting').innerText = greeting;
+          localStorage.setItem('customerGreeting', greeting);
+        }
+      } catch (err) {
+        console.error('Greeting fetch error:', err);
+      }
+      
+      // Enable input and show prompts
+      updateInputState();
+      renderPrompts();
+      input.focus();
+    };
+    dropdownDiv.appendChild(option);
+  });
+  
+  container.appendChild(dropdownDiv);
   messageList.appendChild(container);
   messageList.scrollTop = messageList.scrollHeight;
 }
 
 async function sendMessage(text) {
+  if (!isValidated) {
+    appendMessage(translations[currentLanguage].askIdentifier, 'assistant');
+    return;
+  }
+  
   // Add to conversation context
   conversationContext.push({ role: 'user', content: text });
   currentCustomerNumber = localStorage.getItem('customerNumber') || null;
   currentInvoiceNumber = localStorage.getItem('invoiceNumber') || null;
-
+  
   appendMessage(text, 'user');
   input.value = '';
-
-
+  
   const typingMsg = appendMessage(translations[currentLanguage].typing, 'assistant', true);
 
   const payload = {
@@ -317,7 +402,7 @@ async function sendMessage(text) {
     const data = await response.json();
     messageList.removeChild(typingMsg);
 
-    // Handle multiple invoice selection
+    // Handle multiple invoice selection (shouldn't happen if validated properly)
     if (data.needs_invoice_number && data.invoice_suggestions?.length > 0) {
       displayInvoiceSelection(data.response, data.invoice_suggestions);
       return;
@@ -328,7 +413,7 @@ async function sendMessage(text) {
       currentCustomerNumber = data.session_customer_number;
       localStorage.setItem('customerNumber', currentCustomerNumber);
     }
-
+    
     if (data.session_invoice_number) {
       currentInvoiceNumber = data.session_invoice_number;
       localStorage.setItem('invoiceNumber', currentInvoiceNumber);
@@ -352,13 +437,13 @@ async function sendMessage(text) {
     // Update greeting with customer info
     if (data.customer_greeting) {
       const greeting = translations[currentLanguage].greeting(data.customer_greeting);
-      //document.getElementById('greeting').innerText = greeting;
       localStorage.setItem('customerGreeting', greeting);
     }
 
     // Add assistant response
     conversationContext.push({ role: 'assistant', content: data.response });
     const assistantMsg = appendMessage(data.response, 'assistant');
+    addFeedbackButtons(assistantMsg);
 
     // Log assistant message
     fetch(`${BACKEND_BASE_URL}/log_message`, {
@@ -374,8 +459,6 @@ async function sendMessage(text) {
         session_id: null
       })
     }).catch(err => console.error('Assistant message log error:', err));
-
-    addFeedbackButtons(assistantMsg);
 
     chatStarted = true;
 
@@ -403,10 +486,17 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('greeting').innerText = storedGreeting;
   }
 
+  // Update input state based on validation status
+  updateInputState();
+
   // Check if we need customer/invoice info
   if (!currentCustomerNumber && !currentInvoiceNumber) {
     askForIdentifier();
+  } else if (!isValidated) {
+    // Validate existing identifier
+    validateAndSetupSession(currentInvoiceNumber || currentCustomerNumber);
   } else {
+    // Already validated
     renderPrompts();
   }
 });
@@ -422,11 +512,11 @@ toggle.addEventListener('change', () => {
 
 sendBtn.addEventListener('click', () => {
   const text = input.value.trim();
-  if (text) sendMessage(text);
+  if (text && isValidated) sendMessage(text);
 });
 
 input.addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') sendBtn.click();
+  if (e.key === 'Enter' && isValidated) sendBtn.click();
 });
 
 // Add clear session functionality (for testing)

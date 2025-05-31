@@ -46,6 +46,64 @@ class LogMessageRequest(BaseModel):
     topic: Optional[str] = None
     session_id: Optional[str] = None
 
+class ValidateIdentifierRequest(BaseModel):
+    identifier: str
+    language: str = 'en'
+
+@app.post("/validate_identifier")
+async def validate_identifier(request: ValidateIdentifierRequest):
+    """Validate identifier and return customer/invoice information"""
+    try:
+        # Use the LLM's validate_identifier method
+        is_valid, id_type, data = llm.validate_identifier(request.identifier)
+        
+        if not is_valid:
+            return {
+                "valid": False,
+                "type": "none",
+                "message": "Invalid customer or invoice number"
+            }
+        
+        # Get customer information
+        if data:
+            first_invoice = next(iter(data.values()))
+            invoice_data = first_invoice.get("Data", {})
+            process_data = invoice_data.get("ProzessDaten", {}).get("ProzessDatenElement", {})
+            partner_data = process_data.get("Geschaeftspartner", {}).get("GeschaeftspartnerElement", {})
+            
+            # Get all invoice numbers if multiple
+            invoice_numbers = []
+            if id_type == "customer" and len(data) > 1:
+                invoice_numbers = [
+                    v["Data"]["ProzessDaten"]["ProzessDatenElement"]["invoiceNumber"]
+                    for v in data.values()
+                ]
+            
+            return {
+                "valid": True,
+                "type": id_type,
+                "customer_number": partner_data.get("customerNumber", ""),
+                "customer_name": f"{partner_data.get('firstName', '')} {partner_data.get('name', '')}".strip(),
+                "salutation": partner_data.get("salutation", ""),
+                "multiple_invoices": len(invoice_numbers) > 0,
+                "invoice_numbers": invoice_numbers,
+                "language": request.language
+            }
+        
+        return {
+            "valid": False,
+            "type": "none",
+            "message": "No data found"
+        }
+        
+    except Exception as e:
+        print(f"Validation error: {e}")
+        return {
+            "valid": False,
+            "type": "none",
+            "message": "Error validating identifier"
+        }
+
 @app.post("/chat")
 async def chat_route(request: QueryRequest):
     """Enhanced chat endpoint with Agentic AI capabilities"""
@@ -71,7 +129,7 @@ async def chat_route(request: QueryRequest):
 
         # Extract key information for frontend
         structured = result.get("structured", {})
-        
+
         # Customer identification
         if structured.get("customer_name"):
             response["customer_name"] = structured["customer_name"]
@@ -95,18 +153,25 @@ async def chat_route(request: QueryRequest):
         return response
 
     except Exception as e:
-        # Enhanced error handling
+         # Enhanced error handling with detailed logging
+        print(f"Chat error: {type(e).__name__}: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        
         error_message = f"I encountered an issue processing your request. Please try again."
         if "invoice" in str(e).lower():
             error_message = "I couldn't access your invoice data. Please verify your customer or invoice number."
         elif "network" in str(e).lower() or "connection" in str(e).lower():
             error_message = "There seems to be a connection issue. Please try again in a moment."
+        elif "model" in str(e).lower() or "gpt4all" in str(e).lower():
+            error_message = "The AI model is not properly initialized. Please check the model configuration."
             
         return {
             "response": error_message,
             "structured": {},
             "error": True,
-            "error_type": "processing_error"
+            "error_type": "processing_error",
+            "debug_error": str(e)  # Add debug info
         }
 
 
@@ -249,7 +314,8 @@ async def root():
         "endpoints": {
             "chat": "/chat",
             "log": "/log_message", 
-            "health": "/health"
+            "health": "/health",
+            "validate_identifier": "/validate_identifier"
         }
     }
 

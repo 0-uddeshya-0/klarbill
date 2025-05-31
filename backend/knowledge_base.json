@@ -188,7 +188,7 @@
       {
         "input_en": "Why am I paying an offshore network surcharge?",
         "input_de": "Warum zahle ich eine Offshore-Netzumlage?",
-        "response_en": "This funds offshore wind infrastructure. Rate: [Current rate] ct/kWh, per the Energy Industry Act. Exemptions apply for green energy contracts.",
+        "response_en": "This funds offshore wind infrastructure. Rate: 5.05 ct/kWh, per the Energy Industry Act. Exemptions apply for green energy contracts.",
         "response_de": "Diese finanziert Offshore-Windinfrastruktur. Satz: [Aktueller Satz] ct/kWh gemäß Energiewirtschaftsgesetz. Ausnahmen gelten für Ökostromverträge."
       },
       {

@@ -21,13 +21,16 @@ class QueryType(Enum):
     EXPLANATION = "explanation"
     REGULATORY = "regulatory"
     TROUBLESHOOTING = "troubleshooting"
+    NAVIGATION = "navigation"
+    IDENTIFIER_VALIDATION = "identifier_validation"
 
 @dataclass
 class ResponseFormat:
-    concise: bool = False
+    concise: bool = True
     detailed_calculation: bool = False
     include_regulatory_context: bool = False
     personalized: bool = True
+    conciseness_level: str = "moderate"
 
 class GermanEnergyRegulations:
     """Knowledge base for German energy regulations and billing components"""
@@ -125,6 +128,30 @@ class IntelligentInvoiceAnalyzer:
         period_to = self.process_data.get("invoicePeriodTo", "")
         return total, period_from, period_to
     
+    def get_invoice_amount(self) -> float:
+        """Get total invoice amount"""
+        return float(self.process_data.get("invoiceAmount", 0))
+    
+    def get_bonus_amount(self) -> float:
+        """Get bonus amount applied"""
+        return float(self.process_data.get("bonus", 0))
+    
+    def get_tax_amount(self) -> float:
+        """Get tax amount"""
+        return float(self.process_data.get("taxAmount", 0))
+    
+    def get_net_amount(self) -> float:
+        """Get net invoice amount"""
+        return float(self.process_data.get("netInvoiceAmount", 0))
+    
+    def get_invoice_date(self) -> str:
+        """Get invoice date"""
+        return self.process_data.get("invoiceDate", "")
+    
+    def get_invoice_number(self) -> str:
+        """Get invoice number"""
+        return self.process_data.get("invoiceNumber", "")
+    
     def analyze_unusual_charges(self) -> List[Dict[str, Any]]:
         """Identify and explain unusual or high charges"""
         unusual_items = []
@@ -133,14 +160,14 @@ class IntelligentInvoiceAnalyzer:
         for item in self.billing_items:
             if item.get("priceType") == "BASIC_RATE":
                 amount = float(item.get("amount", 0))
-                if amount > 100:  # High basic charge threshold
+                if amount > 100:
                     unusual_items.append({
                         "type": "high_basic_charge",
                         "amount": amount,
                         "explanation": "Higher than typical basic charge, possibly due to new contract setup or tariff change"
                     })
         
-        # Check for zero usage charges (like in the provided invoice)
+        # Check for zero usage charges
         usage_charges = [item for item in self.billing_items if item.get("priceType") == "USAGE_RATE"]
         if all(float(item.get("amount", 0)) == 0 for item in usage_charges):
             unusual_items.append({
@@ -189,13 +216,14 @@ class ContextualQueryAnalyzer:
     """Analyzes user queries for intent and determines appropriate response strategy"""
     
     GREETINGS = {"hi", "hello", "hey", "good morning", "good afternoon", "good evening",
-                "hallo", "guten morgen", "guten abend", "servus", "grüß gott", "hallo"}
+                "hallo", "guten morgen", "guten abend", "servus", "grüß gott"}
     
     SIMPLE_FACT_PATTERNS = [
         r"(total|gesamt).*consumption|verbrauch",
         r"invoice.*amount|rechnungsbetrag", 
         r"customer.*number|kundennummer",
-        r"how much.*did i (use|consume)|wieviel.*verbraucht"
+        r"how much.*did i (use|consume)|wieviel.*verbraucht",
+        r"kosten.*aufschlüsseln|breakdown.*cost"
     ]
     
     CALCULATION_PATTERNS = [
@@ -209,47 +237,227 @@ class ContextualQueryAnalyzer:
         r"(compared? to|verglichen mit|unterschied)",
         r"(last.*bill|letzte.*rechnung)",
         r"(average|durchschnitt)",
-        r"(higher|lower|höher|niedriger)"
+        r"(higher|lower|höher|niedriger)",
+        r"(€|eur|euro).*higher|höher",
+        r"why.*bill.*increase|warum.*rechnung.*gestiegen"
+    ]
+    
+    NAVIGATION_PATTERNS = [
+        r"where.*find|wo.*finde",
+        r"location.*on.*invoice|stelle.*rechnung",
+        r"section.*invoice|abschnitt.*rechnung",
+        r"how.*navigate|wie.*navigiere"
+    ]
+    
+    EXPLANATION_PATTERNS = [
+        r"was ist|what is",
+        r"was bedeutet|what does.*mean",
+        r"erkläre|explain",
+        r"definition|bedeutung"
     ]
     
     def __init__(self, conversation_history: List[str] = None):
         self.conversation_history = conversation_history or []
         
     def analyze_query(self, query: str) -> Tuple[QueryType, ResponseFormat]:
-        """Analyze query and determine response strategy"""
+        """Analyze query and determine response strategy with conciseness"""
         query_lower = query.lower()
+        query_length = len(query.split())
+        
+        # Determine conciseness level based on query
+        if query_length <= 5 or any(word in query_lower for word in ['how much', 'total', 'amount', 'consumption', 'wieviel']):
+            conciseness_level = "brief"
+        elif any(word in query_lower for word in ['explain', 'detail', 'breakdown', 'why', 'understand', 'erkläre', 'aufschlüsseln']):
+            conciseness_level = "detailed"
+        else:
+            conciseness_level = "moderate"
         
         # Check for greetings
         if any(greet in query_lower for greet in self.GREETINGS):
-            return QueryType.GREETING, ResponseFormat(concise=True, personalized=True)
+            return QueryType.GREETING, ResponseFormat(
+                concise=True, 
+                personalized=True, 
+                conciseness_level="brief"
+            )
+        
+        # Check for explanations/definitions
+        if any(re.search(pattern, query_lower) for pattern in self.EXPLANATION_PATTERNS):
+            return QueryType.EXPLANATION, ResponseFormat(
+                concise=False,
+                include_regulatory_context=True,
+                personalized=True,
+                conciseness_level="moderate"
+            )
+        
+        # Check for navigation queries
+        if any(re.search(pattern, query_lower) for pattern in self.NAVIGATION_PATTERNS):
+            return QueryType.NAVIGATION, ResponseFormat(
+                concise=False, 
+                personalized=True,
+                conciseness_level="moderate"
+            )
         
         # Check for simple facts
         if any(re.search(pattern, query_lower) for pattern in self.SIMPLE_FACT_PATTERNS):
-            if len(query.split()) <= 8:  # Short query = concise response
-                return QueryType.SIMPLE_FACT, ResponseFormat(concise=True, personalized=True)
-            else:
-                return QueryType.SIMPLE_FACT, ResponseFormat(concise=False, personalized=True)
+            return QueryType.SIMPLE_FACT, ResponseFormat(
+                concise=True, 
+                personalized=True,
+                conciseness_level=conciseness_level
+            )
         
         # Check for calculation requests
         if any(re.search(pattern, query_lower) for pattern in self.CALCULATION_PATTERNS):
             return QueryType.CALCULATION, ResponseFormat(
                 detailed_calculation=True, 
-                include_regulatory_context=True,
-                personalized=True
+                include_regulatory_context=False,
+                personalized=True,
+                conciseness_level="moderate"
             )
         
         # Check for comparisons
         if any(re.search(pattern, query_lower) for pattern in self.COMPARISON_PATTERNS):
             return QueryType.COMPARISON, ResponseFormat(
-                detailed_calculation=True,
-                personalized=True
+                detailed_calculation=False,
+                personalized=True,
+                conciseness_level="moderate"
             )
         
-        # Default to explanation with regulatory context
+        # Default to explanation
         return QueryType.EXPLANATION, ResponseFormat(
-            include_regulatory_context=True,
-            personalized=True
+            include_regulatory_context=False,
+            personalized=True,
+            conciseness_level=conciseness_level
         )
+
+class KnowledgeBaseIntegrator:
+    """Enhanced integrator that leverages category structure"""
+    
+    def __init__(self, knowledge_base_path: str = None):
+        self.knowledge_base = {}
+        self.categories = {}
+        if knowledge_base_path:
+            self.load_knowledge_base(knowledge_base_path)
+        else:
+            base_dir = os.path.dirname(os.path.abspath(__file__))
+            kb_path = os.path.join(base_dir, "knowledge_base.json")
+            if os.path.exists(kb_path):
+                self.load_knowledge_base(kb_path)
+    
+    def load_knowledge_base(self, path: str):
+        """Load and organize knowledge base by categories"""
+        try:
+            with open(path, 'r', encoding='utf-8') as f:
+                self.knowledge_base = json.load(f)
+                self.categories = self.knowledge_base.get("utility_invoice_queries", {})
+                print(f"✅ Loaded {len(self.categories)} knowledge base categories")
+        except Exception as e:
+            print(f"Error loading knowledge base: {e}")
+            self.knowledge_base = {}
+            self.categories = {}
+    
+    def get_category_for_query(self, query: str) -> str:
+        """Determine the most relevant category based on query"""
+        query_lower = query.lower()
+        
+        # Category keywords mapping
+        category_keywords = {
+            'invoice_structure': ['where', 'find', 'section', 'invoice structure', 'malo-id', 'obis', 'locate'],
+            'consumption': ['consumption', 'usage', 'kwh', 'meter reading', 'estimate', 'verbrauch'],
+            'pricing_components': ['price', 'cost', 'charge', 'fee', 'component', 'breakdown', 'tariff', 'konzessionsabgabe', 'netzentgelt', 'stromsteuer'],
+            'payments_advances': ['payment', 'advance', 'installment', 'abschlag', 'prepayment', 'verpasse', 'miss'],
+            'payments_credits': ['credit', 'balance', 'refund', 'guthaben'],
+            'late_billing': ['late', 'delayed', 'overdue', 'verspätet'],
+            'regulatory_changes': ['regulation', 'law', 'changes', 'eeg', 'reform'],
+            'contract_terms': ['contract', 'term', 'agreement', 'vertrag'],
+            'disputes_complaints': ['dispute', 'complaint', 'wrong', 'error', 'fehler'],
+            'calculations_examples': ['calculate', 'formula', 'example', 'berechnung'],
+            'bonuses_discounts': ['bonus', 'discount', 'neukunden', 'cashback', 'rabatt'],
+            'meter_operations': ['meter', 'reading', 'zähler', 'ablesung'],
+            'energy_efficiency': ['efficiency', 'save', 'reduce', 'sparen'],
+            'green_energy_options': ['green', 'renewable', 'ökostrom', 'solar'],
+            'taxes_and_vat': ['tax', 'vat', 'mwst', 'steuer'],
+            'special_customer_situations': ['move', 'umzug', 'special', 'hardship'],
+            'consumer_rights': ['rights', 'protection', 'verbraucherschutz'],
+            'dispute_resolution': ['resolution', 'mediation', 'schlichtung'],
+            'energy_transition': ['transition', 'energiewende', 'future'],
+            'comparisons_graphs': ['graph', 'chart', 'compare', 'vergleich'],
+            'energy_price_brake': ['price brake', 'preisbremse', 'cap', 'relief']
+        }
+        
+        # Score each category
+        scores = {}
+        for category, keywords in category_keywords.items():
+            score = sum(2 if keyword in query_lower else 0 for keyword in keywords)
+            # Boost score for exact phrase matches
+            if category.replace('_', ' ') in query_lower:
+                score += 5
+            if score > 0:
+                scores[category] = score
+        
+        # Return highest scoring category
+        if scores:
+            return max(scores, key=scores.get)
+        return 'miscellaneous'
+    
+    def find_relevant_context(self, query: str, language: str = 'en', max_items: int = 5) -> List[Dict[str, str]]:
+        """Enhanced context finding with category awareness"""
+        relevant_items = []
+        query_lower = query.lower()
+        query_words = set(query_lower.split())
+        
+        # First, check the most relevant category
+        primary_category = self.get_category_for_query(query)
+        
+        # Search in primary category first
+        if primary_category in self.categories:
+            items = self.categories.get(primary_category, [])
+            for item in items:
+                input_key = f"input_{language}"
+                if input_key in item:
+                    item_text_lower = item[input_key].lower()
+                    item_words = set(item_text_lower.split())
+                    
+                    # Calculate overlap score
+                    overlap = len(query_words.intersection(item_words))
+                    
+                    # Check for specific term matches
+                    if "konzessionsabgabe" in query_lower and "konzessionsabgabe" in item_text_lower:
+                        overlap += 10  # High boost for exact term match
+                    
+                    # Check for phrase matches
+                    if overlap > 2 or any(phrase in query_lower for phrase in item_text_lower.split('?')[0:1]):
+                        relevant_items.append({
+                            "query": item[input_key],
+                            "response": item.get(f"response_{language}", ""),
+                            "category": primary_category,
+                            "relevance": "high" if overlap > 3 else "medium",
+                            "score": overlap
+                        })
+        
+        # Then search other categories if needed
+        if len(relevant_items) < max_items:
+            for category, items in self.categories.items():
+                if category == primary_category:
+                    continue
+                for item in items:
+                    input_key = f"input_{language}"
+                    if input_key in item:
+                        item_text_lower = item[input_key].lower()
+                        item_words = set(item_text_lower.split())
+                        overlap = len(query_words.intersection(item_words))
+                        
+                        if overlap > 1:
+                            relevant_items.append({
+                                "query": item[input_key],
+                                "response": item.get(f"response_{language}", ""),
+                                "category": category,
+                                "relevance": "medium" if overlap > 2 else "low",
+                                "score": overlap
+                            })
+        
+        # Sort by relevance score and return top items
+        relevant_items.sort(key=lambda x: x['score'], reverse=True)
+        return relevant_items[:max_items]
 
 class AgenticUtilityBillLLM:
     """Intelligent, contextual utility bill assistant with sophisticated reasoning"""
@@ -260,24 +468,98 @@ class AgenticUtilityBillLLM:
         self.model = GPT4All(model_name, model_path=self.model_path)
         
         self.regulations = GermanEnergyRegulations()
+        self.knowledge_base = KnowledgeBaseIntegrator()
         self.conversation_context = {
             'queries': [],
             'language': 'en',
             'customer_data': {},
-            'current_invoice': {}
+            'current_invoice': {},
+            'previous_invoices': []
         }
         
-    def validate_number(self, customer_number=None, invoice_number=None) -> Tuple[bool, Dict]:
-        return fetch_invoice_data(customer_number, invoice_number)
+    def validate_identifier(self, identifier: str) -> Tuple[bool, str, Dict]:
+        """Validate if identifier is customer number or invoice number"""
+        # Try as invoice number first
+        is_valid, data = fetch_invoice_data(invoice_number=identifier)
+        if is_valid:
+            return True, "invoice", data
+        
+        # Try as customer number
+        is_valid, data = fetch_invoice_data(customer_number=identifier)
+        if is_valid:
+            return True, "customer", data
+        
+        return False, "none", {}
+    
+    def compare_with_previous_invoice(self, current_invoice: Dict, all_invoices: Dict) -> Dict[str, Any]:
+        """Compare current invoice with previous invoice"""
+        current_analyzer = IntelligentInvoiceAnalyzer(current_invoice)
+        current_date = datetime.strptime(current_analyzer.get_invoice_date(), "%d.%m.%Y")
+        
+        # Find previous invoice
+        previous_invoice = None
+        previous_date = None
+        
+        for invoice_data in all_invoices.values():
+            invoice = invoice_data.get("Data", {})
+            analyzer = IntelligentInvoiceAnalyzer(invoice)
+            invoice_date = datetime.strptime(analyzer.get_invoice_date(), "%d.%m.%Y")
+            
+            if invoice_date < current_date:
+                if previous_date is None or invoice_date > previous_date:
+                    previous_date = invoice_date
+                    previous_invoice = invoice
+        
+        if not previous_invoice:
+            return {"found": False}
+        
+        previous_analyzer = IntelligentInvoiceAnalyzer(previous_invoice)
+        
+        # Compare key metrics
+        current_amount = current_analyzer.get_invoice_amount()
+        previous_amount = previous_analyzer.get_invoice_amount()
+        amount_difference = current_amount - previous_amount
+        
+        current_consumption = current_analyzer.get_total_consumption()[0]
+        previous_consumption = previous_analyzer.get_total_consumption()[0]
+        consumption_difference = current_consumption - previous_consumption
+        
+        # Analyze reasons for differences
+        reasons = []
+        
+        if consumption_difference > 0:
+            reasons.append(f"Higher consumption: {consumption_difference:.0f} kWh more than previous period")
+        elif consumption_difference < 0:
+            reasons.append(f"Lower consumption: {abs(consumption_difference):.0f} kWh less than previous period")
+        
+        # Check for price changes
+        if amount_difference > 0 and consumption_difference <= 0:
+            reasons.append("Price increase despite similar or lower consumption - likely due to tariff changes")
+        
+        # Check bonus differences
+        current_bonus = current_analyzer.get_bonus_amount()
+        previous_bonus = previous_analyzer.get_bonus_amount()
+        if current_bonus != previous_bonus:
+            reasons.append(f"Bonus difference: €{current_bonus - previous_bonus:.2f}")
+        
+        return {
+            "found": True,
+            "previous_amount": previous_amount,
+            "current_amount": current_amount,
+            "difference": amount_difference,
+            "consumption_difference": consumption_difference,
+            "reasons": reasons,
+            "previous_period": previous_analyzer.get_total_consumption()[1] + " to " + previous_analyzer.get_total_consumption()[2]
+        }
     
     def build_contextual_prompt(self, query: str, analyzer: IntelligentInvoiceAnalyzer, 
                                query_type: QueryType, response_format: ResponseFormat,
-                               language: str = 'en') -> str:
-        """Build sophisticated, context-aware prompt"""
+                               language: str = 'en', comparison_data: Dict = None) -> str:
+        """Build sophisticated, context-aware prompt with proper language support"""
         
         # Customer information
         partner = analyzer.partner_data
-        raw_salutation = partner.get("salutation", "Dear Customer")
+        raw_salutation = partner.get("salutation", "")
         if language == "en":
             if raw_salutation.lower() == "frau":
                 salutation = "Ms."
@@ -287,68 +569,127 @@ class AgenticUtilityBillLLM:
                 salutation = "Dear"
         else:
             salutation = raw_salutation
-        first_name = partner.get("name", "")
-        customer_name = f"{first_name} {partner.get('name', '')}".strip()
+        first_name = partner.get("firstName", "")
+        last_name = partner.get("name", "")
+        customer_name = f"{first_name} {last_name}".strip()
         
         # Invoice analysis
         total_consumption, period_from, period_to = analyzer.get_total_consumption()
         cost_breakdown = analyzer.get_detailed_cost_breakdown()
-        unusual_charges = analyzer.analyze_unusual_charges()
         
-        # Base system instruction
-        system_instruction = f"""You are KlarBill, an intelligent energy billing assistant with deep expertise in German energy regulations and billing practices. You provide nuanced, contextual responses that adapt to the user's specific query.
+        # Get relevant knowledge base context
+        kb_context = self.knowledge_base.find_relevant_context(query, language, max_items=3)
+        
+        # Language-specific instructions
+        language_instruction = {
+            "de": "WICHTIG: Antworte IMMER auf Deutsch. Verwende deutsche Begriffe und Formulierungen.",
+            "en": "IMPORTANT: Always respond in English. Use English terms and phrases."
+        }
+        
+        # Conciseness instructions based on level
+        conciseness_instructions = {
+            "brief": {
+                "de": "Antworte SEHR KURZ in 1-2 Sätzen. Nur die wichtigsten Fakten.",
+                "en": "Answer VERY BRIEFLY in 1-2 sentences. Essential facts only."
+            },
+            "moderate": {
+                "de": "Antworte präzise in 3-4 Sätzen. Wichtiger Kontext inklusive.",
+                "en": "Answer concisely in 3-4 sentences. Include key context."
+            },
+            "detailed": {
+                "de": "Gib eine ausführliche Erklärung mit allen relevanten Details.",
+                "en": "Provide comprehensive explanation with all relevant details."
+            }
+        }
+        
+        # Base system instruction with STRONG language emphasis
+        system_instruction = f"""You are KlarBill, an intelligent energy billing assistant.
 
-CUSTOMER CONTEXT:
-- Customer: {salutation} ({customer_name})
-- Invoice Period: {period_from} to {period_to}
-- Total Consumption: {total_consumption} kWh
-- Invoice Amount: €{analyzer.process_data.get('invoiceAmount', 0)}
-- Language: {'German' if language == 'de' else 'English'}
+{language_instruction[language]}
 
-INTELLIGENT RESPONSE GUIDELINES:
-1. PERSONALIZATION: Use the customer's name and salutation naturally
-2. ADAPTIVE DEPTH: {"Provide concise, direct answers" if response_format.concise else "Provide comprehensive explanations with context"}
-3. CALCULATION TRANSPARENCY: {"Include detailed breakdown with regulatory explanations" if response_format.detailed_calculation else "Focus on key numbers"}
-4. CONVERSATIONAL: Build on previous context, avoid robotic responses
-5. EDUCATIONAL: Explain the "why" behind charges when relevant
+CUSTOMER: {salutation} {customer_name}
+INVOICE: #{analyzer.get_invoice_number()}
+PERIOD: {period_from} - {period_to}
+AMOUNT: €{analyzer.get_invoice_amount():.2f}
+CONSUMPTION: {total_consumption:.0f} kWh
 
-BILLING INTELLIGENCE:
-- This invoice shows: {', '.join([item['type'] for item in unusual_charges]) if unusual_charges else 'standard charges'}
-- Cost Structure: Grid/Metering {cost_breakdown['grid_and_metering']['percentage']:.1f}%, Taxes/Levies {cost_breakdown['taxes_and_levies']['percentage']:.1f}%, Energy Supply {cost_breakdown['energy_supply']['percentage']:.1f}%
+RESPONSE STYLE: {conciseness_instructions[response_format.conciseness_level][language]}
+
+CRITICAL RULES:
+1. ALWAYS use actual invoice data - NEVER use placeholder values like X or €X.XX
+2. {"Antworte auf DEUTSCH" if language == "de" else "Respond in ENGLISH"}
+3. Format numbers properly: €{analyzer.get_invoice_amount():.2f} not €X.XX
+4. Use customer's actual name: {customer_name}
+5. Answer the specific question directly
 """
 
-        if response_format.include_regulatory_context:
+        # Add invoice-specific data
+        system_instruction += f"""
+ACTUAL INVOICE DATA:
+- Net Amount: €{analyzer.get_net_amount():.2f}
+- Tax (19% VAT): €{analyzer.get_tax_amount():.2f}
+- Bonus Applied: €{analyzer.get_bonus_amount():.2f}
+- Grid & Metering: €{cost_breakdown['grid_and_metering']['amount']:.2f} ({cost_breakdown['grid_and_metering']['percentage']:.1f}%)
+- Taxes & Levies: €{cost_breakdown['taxes_and_levies']['amount']:.2f} ({cost_breakdown['taxes_and_levies']['percentage']:.1f}%)
+- Energy Supply: €{cost_breakdown['energy_supply']['amount']:.2f} ({cost_breakdown['energy_supply']['percentage']:.1f}%)
+"""
+
+        # Add specific knowledge for common queries
+        if "konzessionsabgabe" in query.lower():
+            if language == "de":
+                system_instruction += """
+KONZESSIONSABGABE: Die Konzessionsabgabe ist eine Gebühr, die Energieversorger an Gemeinden für die Nutzung öffentlicher Verkehrswege für Stromleitungen zahlen. Die Höhe variiert nach Gemeindegröße (0,11-2,39 ct/kWh). Auf Ihrer Rechnung finden Sie diese unter "Steuern und Umlagen".
+"""
+            else:
+                system_instruction += """
+CONCESSION FEE: The concession fee is paid by energy suppliers to municipalities for using public roads for power lines. Rates vary by municipality size (0.11-2.39 ct/kWh). On your invoice, find this under "Taxes and Levies".
+"""
+
+        # Add knowledge base context if highly relevant
+        if kb_context and any(item['relevance'] == 'high' for item in kb_context):
+            system_instruction += f"\n{'RELEVANTE INFO' if language == 'de' else 'RELEVANT INFO'}:\n"
+            for item in kb_context[:2]:
+                if item['relevance'] == 'high':
+                    system_instruction += f"- {item['response']}\n"
+
+        # Query-specific instructions
+        if query_type == QueryType.SIMPLE_FACT and "aufschlüsseln" in query.lower():
+            if language == "de":
+                system_instruction += f"""
+KOSTENAUFSCHLÜSSELUNG:
+- Grundgebühr + Verbrauchskosten = €{analyzer.get_net_amount():.2f} (netto)
+- Mehrwertsteuer (19%) = €{analyzer.get_tax_amount():.2f}
+- Bonus/Rabatt = -€{analyzer.get_bonus_amount():.2f}
+- GESAMT = €{analyzer.get_invoice_amount():.2f}
+"""
+            else:
+                system_instruction += f"""
+COST BREAKDOWN:
+- Base fee + Usage charges = €{analyzer.get_net_amount():.2f} (net)
+- VAT (19%) = €{analyzer.get_tax_amount():.2f}
+- Bonus/Discount = -€{analyzer.get_bonus_amount():.2f}
+- TOTAL = €{analyzer.get_invoice_amount():.2f}
+"""
+
+        elif query_type == QueryType.COMPARISON and comparison_data and comparison_data.get("found"):
             system_instruction += f"""
-REGULATORY CONTEXT (2025):
-- Smart meter rollout accelerating (95% by 2030)
-- €400 billion grid expansion affecting future charges
-- 80% renewable target by 2030
-- Electricity tax reduced for companies (0.05 ct/kWh)
+COMPARISON DATA:
+- Previous: €{comparison_data['previous_amount']:.2f}
+- Current: €{comparison_data['current_amount']:.2f}  
+- Difference: €{comparison_data['difference']:.2f} ({'+' if comparison_data['difference'] > 0 else ''}{(comparison_data['difference'] / comparison_data['previous_amount'] * 100):.1f}%)
+- Reason: {comparison_data['reasons'][0] if comparison_data['reasons'] else 'No clear reason'}
 """
 
-        # Add detailed invoice data for calculations
-        if response_format.detailed_calculation:
-            system_instruction += f"""
-DETAILED BILLING DATA:
-- Basic Charges: €{sum(float(item.get('amount', 0)) for item in analyzer.billing_items if item.get('priceType') == 'BASIC_RATE')}
-- Usage Charges: €{sum(float(item.get('amount', 0)) for item in analyzer.billing_items if item.get('priceType') == 'USAGE_RATE')}  
-- Tax Amount: €{analyzer.process_data.get('taxAmount', 0)}
-- Bonus Applied: €{analyzer.process_data.get('bonus', 0)}
-- Net Amount: €{analyzer.process_data.get('netInvoiceAmount', 0)}
-
-COMPONENT BREAKDOWN:
-{self._format_component_details(analyzer)}
-"""
-
-        # Add query-specific context
-        query_context = f"\nCURRENT QUERY: {query}\nQUERY TYPE: {query_type.value}\n"
+        # Final query instruction
+        query_context = f"\nQUERY: {query}\n"
         
-        # Add conversation history if available
-        if self.conversation_context['queries']:
-            recent_queries = self.conversation_context['queries'][-3:]  # Last 3 queries
-            query_context += f"CONVERSATION CONTEXT: {'; '.join(recent_queries)}\n"
+        # Strong reminder about language
+        if language == "de":
+            query_context += "Antworte auf DEUTSCH mit echten Daten aus der Rechnung!\n"
+        else:
+            query_context += "Respond in ENGLISH with actual invoice data!\n"
         
-        return system_instruction + query_context + "\nProvide your response:"
+        return system_instruction + query_context + f"\n{'Antwort' if language == 'de' else 'Response'}:"
 
     def _format_component_details(self, analyzer: IntelligentInvoiceAnalyzer) -> str:
         """Format detailed component breakdown for prompts"""
@@ -370,8 +711,12 @@ COMPONENT BREAKDOWN:
         if not bill_context:
             is_valid, bill_context = self.validate_number(customer_number, invoice_number)
             if not is_valid:
+                error_msg = {
+                    "de": "Ich konnte Ihre Rechnungsdaten nicht finden. Bitte überprüfen Sie Ihre Kunden- oder Rechnungsnummer.",
+                    "en": "I couldn't find your invoice data. Could you please verify your customer or invoice number?"
+                }
                 return {
-                    "text": "I couldn't find your invoice data. Could you please verify your customer or invoice number?",
+                    "text": error_msg[language],
                     "structured": {},
                     "needs_invoice_number": False
                 }
@@ -382,8 +727,12 @@ COMPONENT BREAKDOWN:
                 v["Data"]["ProzessDaten"]["ProzessDatenElement"]["invoiceNumber"]
                 for v in bill_context.values()
             ]
+            msg = {
+                "de": f"Ich habe {len(invoice_suggestions)} Rechnungen für Ihr Konto gefunden. Bitte wählen Sie eine Rechnung aus:",
+                "en": f"I found {len(invoice_suggestions)} invoices for your account. Please specify which invoice you'd like me to analyze:"
+            }
             return {
-                "text": "I found multiple invoices for your account. Please specify which invoice you'd like me to analyze:",
+                "text": msg[language],
                 "structured": {},
                 "needs_invoice_number": True,
                 "invoice_suggestions": invoice_suggestions
@@ -392,8 +741,12 @@ COMPONENT BREAKDOWN:
         # Get the invoice data
         invoice = next(iter(bill_context.values()), {}).get("Data", {})
         if not invoice:
+            error_msg = {
+                "de": "Ich konnte nicht auf Ihre Rechnungsdetails zugreifen. Bitte versuchen Sie es erneut.",
+                "en": "I couldn't access your invoice details. Please try again."
+            }
             return {
-                "text": "I couldn't access your invoice details. Please try again.",
+                "text": error_msg[language],
                 "structured": {}, 
                 "needs_invoice_number": False
             }
@@ -405,12 +758,23 @@ COMPONENT BREAKDOWN:
         # Analyze query and determine response strategy
         query_type, response_format = query_analyzer.analyze_query(query)
         
-        # Build contextual prompt
-        prompt = self.build_contextual_prompt(query, analyzer, query_type, response_format, language)
+        # Check if this is a comparison query
+        comparison_data = None
+        if query_type == QueryType.COMPARISON:
+            # Get all invoices for comparison
+            all_invoices = bill_context
+            if customer_number and not invoice_number:
+                # Fetch all invoices for the customer
+                _, all_invoices = fetch_invoice_data(customer_number=customer_number)
+            
+            comparison_data = self.compare_with_previous_invoice(invoice, all_invoices)
+        
+        # Build contextual prompt with proper language support
+        prompt = self.build_contextual_prompt(query, analyzer, query_type, response_format, language, comparison_data)
         
         # Generate response with appropriate parameters
-        max_tokens = 1000 if response_format.concise else 1800
-        response = self.model.generate(prompt, max_tokens=max_tokens, temp=0.3).strip()
+        max_tokens = 300 if response_format.conciseness_level == "brief" else 600 if response_format.conciseness_level == "moderate" else 1200
+        response = self.model.generate(prompt, max_tokens=max_tokens, temp=0.1).strip()  # Very low temp for consistency
         
         # Prepare structured data
         total_consumption, period_from, period_to = analyzer.get_total_consumption()
@@ -421,20 +785,27 @@ COMPONENT BREAKDOWN:
             "salutation": analyzer.partner_data.get("salutation", ""),
             "consumption": total_consumption,
             "consumption_period": f"{period_from} to {period_to}",
-            "invoice_amount": analyzer.process_data.get("invoiceAmount"),
-            "net_amount": analyzer.process_data.get("netInvoiceAmount"), 
-            "tax_amount": analyzer.process_data.get("taxAmount"),
-            "bonus": analyzer.process_data.get("bonus"),
-            "invoice_number": analyzer.process_data.get("invoiceNumber"),
+            "invoice_amount": analyzer.get_invoice_amount(),
+            "net_amount": analyzer.get_net_amount(), 
+            "tax_amount": analyzer.get_tax_amount(),
+            "bonus": analyzer.get_bonus_amount(),
+            "invoice_number": analyzer.get_invoice_number(),
             "cost_breakdown": cost_breakdown,
             "unusual_charges": analyzer.analyze_unusual_charges(),
             "query_type": query_type.value,
             "response_format": {
                 "concise": response_format.concise,
                 "detailed_calculation": response_format.detailed_calculation,
-                "regulatory_context": response_format.include_regulatory_context
-            }
+                "regulatory_context": response_format.include_regulatory_context,
+                "conciseness_level": response_format.conciseness_level
+            },
+            "knowledge_base_category": self.knowledge_base.get_category_for_query(query),
+            "language": language
         }
+        
+        # Add comparison data if available
+        if comparison_data:
+            structured_data["comparison"] = comparison_data
         
         return {
             "text": response,
@@ -442,23 +813,6 @@ COMPONENT BREAKDOWN:
             "needs_invoice_number": False
         }
 
-# Example usage and testing
-if __name__ == "__main__":
-    llm = AgenticUtilityBillLLM()
-    
-    # Test with different query types
-    test_queries = [
-        "Hello! How much electricity did I consume this year?",  # Simple fact
-        "Can you explain how my bill amount was calculated?",    # Detailed calculation
-        "Why is my bill so high this time?",                    # Explanation with analysis
-        "What's included in the grid charges?"                  # Regulatory explanation
-    ]
-    
-    #customer_number = "10000593"  # From the sample invoice
-    
-    for query in test_queries:
-        print(f"\nQuery: {query}")
-        response = llm.get_response(query, customer_number=customer_number)
-        print(f"Response: {response['text']}")
-        print(f"Query Type: {response['structured'].get('query_type', 'unknown')}")
-        print("-" * 50)
+    def validate_number(self, customer_number=None, invoice_number=None) -> Tuple[bool, Dict]:
+        """Validate and fetch invoice data"""
+        return fetch_invoice_data(customer_number, invoice_number)
