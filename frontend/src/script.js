@@ -512,11 +512,18 @@ toggle.addEventListener('change', () => {
 
 sendBtn.addEventListener('click', () => {
   const text = input.value.trim();
+  promptList.style.display = 'none';
+  chatStarted = true;
   if (text && isValidated) sendMessage(text);
 });
 
 input.addEventListener('keypress', (e) => {
-  if (e.key === 'Enter' && isValidated) sendBtn.click();
+  if (e.key === 'Enter' && isValidated) {
+    promptList.style.display = 'none';
+    chatStarted = true;
+    sendBtn.click();
+  }
+    
 });
 
 // Add clear session functionality (for testing)
