@@ -1,10 +1,11 @@
-// script.js - Enhanced for Agentic AI Integration
+// script.js - Enhanced for Agentic AI Integration with Badges and DOB Verification
 
 function clearSessionData() {
   localStorage.removeItem('customerNumber');
   localStorage.removeItem('invoiceNumber');
   localStorage.removeItem('customerGreeting');
   localStorage.removeItem('validatedIdentifier');
+  localStorage.removeItem('dobVerified');
 }
 
 const toggle = document.getElementById('theme-toggle');
@@ -41,6 +42,7 @@ let currentLanguage = localStorage.getItem('language') || 'en';
 let currentCustomerNumber = urlCustomerNumber || localStorage.getItem('customerNumber') || null;
 let currentInvoiceNumber = urlInvoiceNumber || localStorage.getItem('invoiceNumber') || null;
 let isValidated = localStorage.getItem('validatedIdentifier') === 'true';
+let isDobVerified = localStorage.getItem('dobVerified') === 'true';
 
 const storedGreeting = localStorage.getItem('customerGreeting');
 if (storedGreeting) {
@@ -76,7 +78,13 @@ const translations = {
     defaultGreeting: 'Billing chaos? Don\'t worry. KlarBill makes it clear.',
     validating: 'Validating your information...',
     invalidIdentifier: 'Invalid customer or invoice number. Please check and try again.',
-    multipleInvoices: 'Multiple invoices found. Please select one:'
+    multipleInvoices: 'Multiple invoices found. Please select one:',
+    customerBadge: 'Customer',
+    invoiceBadge: 'Invoice',
+    verifyDob: 'Please verify your identity by entering your date of birth:',
+    dobError: 'The date of birth does not match our records. Please try again.',
+    verifying: 'Verifying...',
+    dobSuccess: 'Identity verified successfully!'
   },
   de: {
     prompts: [
@@ -97,14 +105,234 @@ const translations = {
     defaultGreeting: 'Abrechnungschaos? Keine Sorge. KlarBill macht es klar.',
     validating: 'Überprüfe deine Informationen...',
     invalidIdentifier: 'Ungültige Kunden- oder Rechnungsnummer. Bitte überprüfen und erneut versuchen.',
-    multipleInvoices: 'Mehrere Rechnungen gefunden. Bitte wähle eine:'
+    multipleInvoices: 'Mehrere Rechnungen gefunden. Bitte wähle eine:',
+    customerBadge: 'Kunde',
+    invoiceBadge: 'Rechnung',
+    verifyDob: 'Bitte bestätige deine Identität durch Eingabe deines Geburtsdatums:',
+    dobError: 'Das Geburtsdatum stimmt nicht mit unseren Daten überein. Bitte erneut versuchen.',
+    verifying: 'Überprüfe...',
+    dobSuccess: 'Identität erfolgreich bestätigt!'
   }
 };
 
 document.getElementById('greeting').innerText = translations[currentLanguage].defaultGreeting;
 
+// Badge Management Functions
+function createBadgeContainer() {
+  const existingContainer = document.getElementById('badge-container');
+  if (existingContainer) return existingContainer;
+  
+  const container = document.createElement('div');
+  container.id = 'badge-container';
+  container.className = 'badge-container';
+  
+  const chatBox = document.querySelector('.chat-box');
+  chatBox.insertBefore(container, chatBox.firstChild);
+  
+  return container;
+}
+
+function addBadge(type, value) {
+  const container = createBadgeContainer();
+  
+  // Remove existing badge of same type
+  const existingBadge = container.querySelector(`[data-badge-type="${type}"]`);
+  if (existingBadge) existingBadge.remove();
+  
+  const badge = document.createElement('div');
+  badge.className = 'identifier-badge';
+  badge.setAttribute('data-badge-type', type);
+  
+  const label = type === 'customer' ? translations[currentLanguage].customerBadge : translations[currentLanguage].invoiceBadge;
+  
+  badge.innerHTML = `
+    <span class="badge-label">${label}:</span>
+    <span class="badge-value">${value}</span>
+    <button class="badge-close" aria-label="Remove">×</button>
+  `;
+  
+  badge.querySelector('.badge-close').onclick = () => removeBadge(type);
+  
+  container.appendChild(badge);
+}
+
+function removeBadge(type) {
+  const container = document.getElementById('badge-container');
+  if (!container) return;
+  
+  const badge = container.querySelector(`[data-badge-type="${type}"]`);
+  if (badge) badge.remove();
+  
+  // Clear the corresponding identifier
+  if (type === 'customer') {
+    localStorage.removeItem('customerNumber');
+    localStorage.removeItem('customerGreeting');
+    currentCustomerNumber = null;
+    
+    // If invoice badge exists, check if it's still valid
+    if (currentInvoiceNumber) {
+      // Re-validate the invoice to ensure it's still accessible
+      validateInvoiceStillValid();
+    } else {
+      // No identifiers left, restart identification process
+      resetIdentificationProcess();
+    }
+  } else if (type === 'invoice') {
+    localStorage.removeItem('invoiceNumber');
+    currentInvoiceNumber = null;
+    
+    // If customer number exists and has multiple invoices, show selection
+    if (currentCustomerNumber) {
+      checkForMultipleInvoices();
+    } else {
+      resetIdentificationProcess();
+    }
+  }
+  
+  // Remove empty container
+  if (container.children.length === 0) {
+    container.remove();
+  }
+}
+
+async function validateInvoiceStillValid() {
+  // Check if current invoice is still valid without customer number
+  try {
+    const response = await fetch(`${BACKEND_BASE_URL}/validate_identifier`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        identifier: currentInvoiceNumber,
+        language: currentLanguage
+      })
+    });
+    
+    const data = await response.json();
+    if (!data.valid) {
+      // Invoice not valid on its own, need to re-identify
+      localStorage.removeItem('invoiceNumber');
+      currentInvoiceNumber = null;
+      removeBadge('invoice');
+      resetIdentificationProcess();
+    }
+  } catch (error) {
+    console.error('Invoice validation error:', error);
+    resetIdentificationProcess();
+  }
+}
+
+async function checkForMultipleInvoices() {
+  // Check if customer has multiple invoices
+  try {
+    const response = await fetch(`${BACKEND_BASE_URL}/validate_identifier`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        identifier: currentCustomerNumber,
+        language: currentLanguage
+      })
+    });
+    
+    const data = await response.json();
+    if (data.valid && data.multiple_invoices && data.invoice_numbers.length > 0) {
+      displayInvoiceSelection(
+        translations[currentLanguage].multipleInvoices,
+        data.invoice_numbers
+      );
+    }
+  } catch (error) {
+    console.error('Multiple invoice check error:', error);
+  }
+}
+
+function resetIdentificationProcess() {
+  isValidated = false;
+  isDobVerified = false;
+  localStorage.removeItem('validatedIdentifier');
+  localStorage.removeItem('dobVerified');
+  chatStarted = false;
+  messageList.innerHTML = '';
+  promptList.innerHTML = '';
+  updateInputState();
+  askForIdentifier();
+}
+
+// Date of Birth Modal Functions
+function showDobModal(expectedDob) {
+  // Create modal overlay
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  
+  const modal = document.createElement('div');
+  modal.className = 'modal-content';
+  
+  modal.innerHTML = `
+    <h3>${translations[currentLanguage].verifyDob}</h3>
+    <input type="date" id="dob-input" class="dob-input" max="${new Date().toISOString().split('T')[0]}">
+    <div class="modal-buttons">
+      <button id="verify-dob-btn" class="modal-btn primary">${currentLanguage === 'en' ? 'Verify' : 'Bestätigen'}</button>
+    </div>
+    <div id="dob-error" class="dob-error" style="display: none;"></div>
+  `;
+  
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+  
+  const dobInput = document.getElementById('dob-input');
+  const verifyBtn = document.getElementById('verify-dob-btn');
+  const errorDiv = document.getElementById('dob-error');
+  
+  dobInput.focus();
+  
+  async function verifyDob() {
+    const inputDate = dobInput.value;
+    if (!inputDate) return;
+    
+    verifyBtn.textContent = translations[currentLanguage].verifying;
+    verifyBtn.disabled = true;
+    
+    // Simulate verification delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    if (inputDate === expectedDob) {
+      // Success
+      isDobVerified = true;
+      localStorage.setItem('dobVerified', 'true');
+      
+      // Show success message briefly
+      errorDiv.style.display = 'none';
+      modal.innerHTML = `
+        <div class="dob-success">
+          <div class="success-icon">✓</div>
+          <p>${translations[currentLanguage].dobSuccess}</p>
+        </div>
+      `;
+      
+      setTimeout(() => {
+        overlay.remove();
+        updateInputState();
+        renderPrompts();
+        input.focus();
+      }, 1500);
+    } else {
+      // Error
+      errorDiv.textContent = translations[currentLanguage].dobError;
+      errorDiv.style.display = 'block';
+      verifyBtn.textContent = currentLanguage === 'en' ? 'Verify' : 'Bestätigen';
+      verifyBtn.disabled = false;
+      dobInput.value = '';
+      dobInput.focus();
+    }
+  }
+  
+  verifyBtn.onclick = verifyDob;
+  dobInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') verifyDob();
+  });
+}
+
 function updateInputState() {
-  if (isValidated && (currentCustomerNumber || currentInvoiceNumber)) {
+  if (isValidated && isDobVerified && (currentCustomerNumber || currentInvoiceNumber)) {
     input.disabled = false;
     input.placeholder = translations[currentLanguage].inputPlaceholder;
     inputEnabled = true;
@@ -120,6 +348,14 @@ function updateLanguageUI() {
   localStorage.setItem('language', currentLanguage);
   updateInputState();
   renderPrompts();
+  
+  // Update badge labels
+  const badges = document.querySelectorAll('.identifier-badge');
+  badges.forEach(badge => {
+    const type = badge.getAttribute('data-badge-type');
+    const label = type === 'customer' ? translations[currentLanguage].customerBadge : translations[currentLanguage].invoiceBadge;
+    badge.querySelector('.badge-label').textContent = label + ':';
+  });
   
   const storedGreeting = localStorage.getItem('customerGreeting');
   if (storedGreeting) {
@@ -150,7 +386,7 @@ function updateLanguageUI() {
 }
 
 function renderPrompts() {
-  if (chatStarted || !isValidated) return;
+  if (chatStarted || !isValidated || !isDobVerified) return;
   
   promptList.innerHTML = '';
   translations[currentLanguage].prompts.forEach(text => {
@@ -195,7 +431,7 @@ function handleFeedback(container, isPositive) {
     translations[currentLanguage].sorryFeedback;
 }
 
-async function validateAndSetupSession(identifier) {
+async function validateAndSetupSession(identifier, skipDobCheck = false) {
   const loadingMsg = appendMessage(translations[currentLanguage].validating, 'assistant');
   
   try {
@@ -217,15 +453,29 @@ async function validateAndSetupSession(identifier) {
       return;
     }
     
+    // Store DOB for verification
+    let customerDob = null;
+    
     // Valid identifier found
     if (data.type === 'invoice') {
       currentInvoiceNumber = identifier;
       currentCustomerNumber = data.customer_number;
       localStorage.setItem('invoiceNumber', identifier);
       localStorage.setItem('customerNumber', data.customer_number);
+      
+      // Add badges
+      addBadge('customer', data.customer_number);
+      addBadge('invoice', identifier);
+      
+      customerDob = data.date_of_birth;
     } else if (data.type === 'customer') {
       currentCustomerNumber = identifier;
       localStorage.setItem('customerNumber', identifier);
+      
+      // Add customer badge
+      addBadge('customer', identifier);
+      
+      customerDob = data.date_of_birth;
       
       // Check if multiple invoices
       if (data.multiple_invoices && data.invoice_numbers.length > 0) {
@@ -246,8 +496,8 @@ async function validateAndSetupSession(identifier) {
       const salutation = data.salutation;
       let greeting;
       if (currentLanguage === 'en') {
-        const salutationEn = salutation.toLowerCase() === 'Frau' ? 'Ms.' : 
-                           salutation.toLowerCase() === 'Herr' ? 'Mr.' : salutation;
+        const salutationEn = salutation.toLowerCase() === 'frau' ? 'Ms.' : 
+                           salutation.toLowerCase() === 'herr' ? 'Mr.' : salutation;
         greeting = translations[currentLanguage].greeting(`${salutationEn} ${data.customer_name}`);
       } else {
         greeting = translations[currentLanguage].greeting(`${salutation} ${data.customer_name}`);
@@ -256,10 +506,15 @@ async function validateAndSetupSession(identifier) {
       localStorage.setItem('customerGreeting', greeting);
     }
     
-    // Enable input and show prompts
-    updateInputState();
-    renderPrompts();
-    input.focus();
+    // Check if DOB verification needed
+    if (!isDobVerified && !skipDobCheck && customerDob) {
+      showDobModal(customerDob);
+    } else {
+      // Enable input and show prompts
+      updateInputState();
+      renderPrompts();
+      input.focus();
+    }
     
   } catch (error) {
     console.error('Validation error:', error);
@@ -334,32 +589,44 @@ function displayInvoiceSelection(response, suggestions) {
       isValidated = true;
       localStorage.setItem('validatedIdentifier', 'true');
       
+      // Add invoice badge
+      addBadge('invoice', invoiceNum);
+      
       container.remove();
       
-      // Fetch greeting for the selected invoice
+      // Fetch greeting and DOB for the selected invoice
       try {
-        const response = await fetch(`${BACKEND_BASE_URL}/customer_name`, {
+        const response = await fetch(`${BACKEND_BASE_URL}/validate_identifier`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            invoice_number: invoiceNum,
+            identifier: invoiceNum,
             language: currentLanguage
           })
         });
         const data = await response.json();
+        
         if (data.customer_greeting) {
           const greeting = translations[currentLanguage].greeting(data.customer_greeting);
           document.getElementById('greeting').innerText = greeting;
           localStorage.setItem('customerGreeting', greeting);
         }
+        
+        // Check DOB verification
+        if (!isDobVerified && data.date_of_birth) {
+          showDobModal(data.date_of_birth);
+        } else {
+          // Enable input and show prompts
+          updateInputState();
+          renderPrompts();
+          input.focus();
+        }
       } catch (err) {
-        console.error('Greeting fetch error:', err);
+        console.error('Invoice selection error:', err);
+        updateInputState();
+        renderPrompts();
+        input.focus();
       }
-      
-      // Enable input and show prompts
-      updateInputState();
-      renderPrompts();
-      input.focus();
     };
     dropdownDiv.appendChild(option);
   });
@@ -370,7 +637,7 @@ function displayInvoiceSelection(response, suggestions) {
 }
 
 async function sendMessage(text) {
-  if (!isValidated) {
+  if (!isValidated || !isDobVerified) {
     appendMessage(translations[currentLanguage].askIdentifier, 'assistant');
     return;
   }
@@ -486,6 +753,14 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('greeting').innerText = storedGreeting;
   }
 
+  // Restore badges if identifiers exist
+  if (currentCustomerNumber) {
+    addBadge('customer', currentCustomerNumber);
+  }
+  if (currentInvoiceNumber) {
+    addBadge('invoice', currentInvoiceNumber);
+  }
+
   // Update input state based on validation status
   updateInputState();
 
@@ -494,9 +769,12 @@ window.addEventListener('DOMContentLoaded', () => {
     askForIdentifier();
   } else if (!isValidated) {
     // Validate existing identifier
+    validateAndSetupSession(currentInvoiceNumber || currentCustomerNumber, !isDobVerified);
+  } else if (!isDobVerified) {
+    // Need DOB verification
     validateAndSetupSession(currentInvoiceNumber || currentCustomerNumber);
   } else {
-    // Already validated
+    // Already validated and verified
     renderPrompts();
   }
 });
@@ -512,11 +790,17 @@ toggle.addEventListener('change', () => {
 
 sendBtn.addEventListener('click', () => {
   const text = input.value.trim();
-  if (text && isValidated) sendMessage(text);
+  promptList.style.display = 'none';
+  chatStarted = true;
+  if (text && isValidated && isDobVerified) sendMessage(text);
 });
 
 input.addEventListener('keypress', (e) => {
-  if (e.key === 'Enter' && isValidated) sendBtn.click();
+  if (e.key === 'Enter' && isValidated && isDobVerified) {
+    promptList.style.display = 'none';
+    chatStarted = true;
+    sendBtn.click();
+  }
 });
 
 // Add clear session functionality (for testing)

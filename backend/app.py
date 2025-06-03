@@ -71,6 +71,9 @@ async def validate_identifier(request: ValidateIdentifierRequest):
             process_data = invoice_data.get("ProzessDaten", {}).get("ProzessDatenElement", {})
             partner_data = process_data.get("Geschaeftspartner", {}).get("GeschaeftspartnerElement", {})
             
+            # Get date of birth
+            date_of_birth = partner_data.get("dateOfBirth", "")
+            
             # Get all invoice numbers if multiple
             invoice_numbers = []
             if id_type == "customer" and len(data) > 1:
@@ -85,6 +88,7 @@ async def validate_identifier(request: ValidateIdentifierRequest):
                 "customer_number": partner_data.get("customerNumber", ""),
                 "customer_name": f"{partner_data.get('firstName', '')} {partner_data.get('name', '')}".strip(),
                 "salutation": partner_data.get("salutation", ""),
+                "date_of_birth": date_of_birth,  # Add DOB to response
                 "multiple_invoices": len(invoice_numbers) > 0,
                 "invoice_numbers": invoice_numbers,
                 "language": request.language
