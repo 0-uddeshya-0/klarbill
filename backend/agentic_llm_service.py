@@ -1,4 +1,4 @@
-    # agentic_llm_service.py
+# agentic_llm_service.py
 
 import os
 import re
@@ -63,17 +63,17 @@ class GermanEnergyRegulations:
         "kwkg_umlage": {
             "name_de": "KWKG-Umlage",
             "name_en": "CHP Levy (Combined Heat and Power)",
-            "explanation_de": "Förderung von Kraft-Wärme-Kopplung zur Energieeffizienz. NICHT dasselbe wie Netzkosten!",
-            "explanation_en": "Support for combined heat and power for energy efficiency. NOT the same as grid costs!",
-            "current_rate": "Variable, typically 0.2-0.5 ct/kWh",
+            "explanation_de": "Förderung von Kraft-Wärme-Kopplung zur Energieeffizienz. 2025: 0,277 ct/kWh",
+            "explanation_en": "Support for combined heat and power for energy efficiency. 2025: 0.277 ct/kWh",
+            "current_rate_2025": "0.277",
             "regulated_by": "Federal Government"
         },
         "offshore_umlage": {
             "name_de": "Offshore-Netzumlage", 
             "name_en": "Offshore Grid Levy",
-            "explanation_de": "Finanzierung der Offshore-Windpark-Netzanbindung",
-            "explanation_en": "Financing of offshore wind farm grid connections",
-            "current_rate": "Variable, typically 0.4-0.8 ct/kWh"
+            "explanation_de": "Finanzierung der Offshore-Windpark-Netzanbindung. 2025: 0,816 ct/kWh",
+            "explanation_en": "Financing of offshore wind farm grid connections. 2025: 0.816 ct/kWh",
+            "current_rate_2025": "0.816"
         },
         "konzessionsabgabe": {
             "name_de": "Konzessionsabgabe",
@@ -116,10 +116,12 @@ class GermanEnergyRegulations:
     }
 
     RECENT_CHANGES_2025 = {
+        "kwkg_umlage": "KWKG-Umlage increased to 0.277 ct/kWh for 2025",
+        "offshore_umlage": "Offshore-Netzumlage increased to 0.816 ct/kWh for 2025",
+        "stromNEV_umlage": "StromNEV-Umlage increased significantly to 1.558 ct/kWh for 2025",
+        "total_levies": "Total levies increased by 68.42% to 2.651 ct/kWh for 2025",
         "electricity_tax_reduction": "Electricity tax for companies reduced to EU minimum 0.05 ct/kWh for 2024-2025",
-        "smart_meter_rollout": "Accelerated smart meter deployment: 20% by 2025, 50% by 2028, 95% by 2030",
-        "grid_expansion": "€400 billion investment in grid expansion affecting future grid charges",
-        "renewable_target": "80% renewable electricity by 2030, climate neutrality by 2035"
+        "smart_meter_rollout": "Accelerated smart meter deployment: 20% by 2025, 50% by 2028, 95% by 2030"
     }
 
 def fetch_invoice_data(customer_number=None, invoice_number=None) -> Tuple[bool, Dict[str, Any]]:
@@ -149,7 +151,7 @@ def fetch_invoice_data(customer_number=None, invoice_number=None) -> Tuple[bool,
         return False, {}
 
 class IntelligentInvoiceAnalyzer:
-    """Advanced invoice analysis with deep contextual understanding"""
+    """Advanced invoice analysis with corrected data extraction"""
     
     def __init__(self, invoice_data: Dict[str, Any]):
         self.invoice_data = invoice_data
@@ -160,10 +162,26 @@ class IntelligentInvoiceAnalyzer:
         self.cost_breakdown = invoice_data.get("Kostenblock", {}).get("KostenblockElement", [])
         
     def get_total_consumption(self) -> Tuple[float, str, str]:
-        """Get total consumption with period details"""
-        total = sum(float(item.get("consumption", 0)) for item in self.consumption_data)
-        period_from = self.process_data.get("invoicePeriodFrom", "")
-        period_to = self.process_data.get("invoicePeriodTo", "")
+        """Get total consumption from AbrechnungsmengenElement - CORRECTED"""
+        total = 0
+        period_from = ""
+        period_to = ""
+        
+        if self.consumption_data:
+            # Sum all consumption periods from meter readings
+            total = sum(float(item.get("consumption", 0)) for item in self.consumption_data)
+            
+            # Get period from first and last entries
+            if len(self.consumption_data) > 0:
+                period_from = self.consumption_data[0].get("dateFrom", "")
+                period_to = self.consumption_data[-1].get("dateTo", "")
+        
+        # Fallback to process data if no consumption elements
+        if total == 0:
+            period_from = self.process_data.get("invoicePeriodFrom", "")
+            period_to = self.process_data.get("invoicePeriodTo", "")
+            total = float(self.process_data.get("consumption", 0))
+        
         return total, period_from, period_to
     
     def get_invoice_amount(self) -> float:
@@ -190,76 +208,165 @@ class IntelligentInvoiceAnalyzer:
         """Get invoice number"""
         return self.process_data.get("invoiceNumber", "")
     
-    def get_working_price(self) -> float:
-        """Get the actual working price (Arbeitspreis) in ct/kWh"""
-        # Extract from current tariff data, convert from ct to €
-        working_price_ct = float(self.process_data.get("currentWorkPrice", 0))
-        return working_price_ct / 100  # Convert ct/kWh to €/kWh
+    def get_working_price_details(self) -> Dict[str, Any]:
+        """Get working price information from actual billing - SIMPLIFIED"""
+        working_prices = []
+        current_tariff_price = float(self.process_data.get("currentWorkPrice", 0)) / 100  # Convert ct to €
+        
+        # Extract actual billed working prices from billing items
+        for item in self.billing_items:
+            if item.get("priceType") == "USAGE_RATE" and item.get("name") == "Arbeit":
+                price_ct = float(item.get("price", 0))  # This is in ct/kWh
+                date_from = item.get("dateFrom", "")
+                date_to = item.get("dateTo", "")
+                
+                working_prices.append({
+                    "period": f"{date_from} - {date_to}",
+                    "price_ct_per_kwh": price_ct,
+                    "price_euro_per_kwh": price_ct / 100,
+                    "date_from": date_from,
+                    "date_to": date_to
+                })
+        
+        # If only one price period, use that as the main price
+        main_price_ct = working_prices[0]["price_ct_per_kwh"] if working_prices else current_tariff_price * 100
+        has_multiple_periods = len(working_prices) > 1
+        
+        return {
+            "current_tariff_ct_per_kwh": current_tariff_price * 100,
+            "main_price_ct_per_kwh": main_price_ct,
+            "billed_periods": working_prices,
+            "has_multiple_periods": has_multiple_periods
+        }
     
     def get_base_price(self) -> Tuple[float, float]:
-        """Get base price (Grundpreis) - returns (net_annual, gross_annual)"""
-        # Net base price from billing items
+        """Get base price (Grundpreis) - CORRECTED"""
         base_price_net = 0
+        
+        # Get from billing items
         for item in self.billing_items:
             if item.get("priceType") == "BASIC_RATE" and item.get("name") == "Grundkosten":
                 base_price_net = float(item.get("amount", 0))
                 break
         
-        # Gross base price from process data
+        # Get gross base price from process data
         base_price_gross = float(self.process_data.get("currentBasePrice", 0))
         
         return base_price_net, base_price_gross
     
-    def get_kwkg_amount(self) -> float:
-        """Get actual KWKG-Umlage amount charged"""
-        kwkg_amount = 0
-        # Look in detailed billing items for KWKG-Umlage
-        for item in self.billing_items:
-            if item.get("Abrechnungspositionen-Detailliert"):
-                details = item["Abrechnungspositionen-Detailliert"]["Abrechnungspositionen-DetailliertElement"]
-                for detail in details:
-                    if "KWKG" in detail.get("name", ""):
-                        kwkg_amount += float(detail.get("amount", 0))
-        return kwkg_amount
-    
-    def is_zero_consumption_bill(self) -> bool:
-        """Check if this is a zero consumption bill (setup/initial)"""
-        total_consumption, _, _ = self.get_total_consumption()
-        return total_consumption == 0
-    
     def get_specific_levy_amounts(self) -> Dict[str, float]:
-        """Get specific amounts for each German energy levy"""
+        """Calculate actual levy amounts - CORRECTED"""
         levies = {
             "KWKG-Umlage": 0,
             "Offshore-Netzumlage": 0,
             "Konzessionsabgabe": 0,
             "NEV-Umlage": 0,
-            "Stromsteuer": 0
+            "Stromsteuer": 0,
+            "Netznutzung": 0,
+            "Messstellenbetrieb": 0
         }
         
-        # Look through detailed billing items
+        total_consumption, _, _ = self.get_total_consumption()
+        
+        # Extract from detailed billing items
         for item in self.billing_items:
             if item.get("Abrechnungspositionen-Detailliert"):
                 details = item["Abrechnungspositionen-Detailliert"]["Abrechnungspositionen-DetailliertElement"]
                 for detail in details:
                     name = detail.get("name", "")
-                    amount = float(detail.get("amount", 0))
+                    price_ct = float(detail.get("price", 0))
+                    detail_type = detail.get("type", "")
                     
-                    if "KWKG" in name:
-                        levies["KWKG-Umlage"] += amount
-                    elif "Offshore" in name:
-                        levies["Offshore-Netzumlage"] += amount
-                    elif "Konzessionsabgabe" in name:
-                        levies["Konzessionsabgabe"] += amount
-                    elif "NEV" in name:
-                        levies["NEV-Umlage"] += amount
-                    elif "Stromsteuer" in name:
-                        levies["Stromsteuer"] += amount
+                    # For usage-based charges
+                    if detail.get("priceType") == "USAGE_RATE" and total_consumption > 0:
+                        amount = (price_ct / 100) * total_consumption
+                        
+                        if "KWKG" in name:
+                            levies["KWKG-Umlage"] += amount
+                        elif "Offshore" in name:
+                            levies["Offshore-Netzumlage"] += amount
+                        elif "Konzessionsabgabe" in name:
+                            levies["Konzessionsabgabe"] += amount
+                        elif "NEV" in name:
+                            levies["NEV-Umlage"] += amount
+                        elif "Stromsteuer" in name:
+                            levies["Stromsteuer"] += amount
+                        elif detail_type == "GRID_USAGE":
+                            levies["Netznutzung"] += amount
+                    
+                    # For basic charges
+                    elif detail.get("priceType") == "BASIC_RATE":
+                        amount = price_ct
+                        if detail_type == "GRID_USAGE":
+                            levies["Netznutzung"] += amount
+                        elif detail_type == "METERING_POINT_OPERATION":
+                            levies["Messstellenbetrieb"] += amount
         
         return levies
     
+    def is_zero_consumption_bill(self) -> bool:
+        """Check if this is a zero consumption bill"""
+        total_consumption, _, _ = self.get_total_consumption()
+        return total_consumption == 0
+    
+    def get_detailed_cost_breakdown(self) -> Dict[str, Any]:
+        """Get cost breakdown - CORRECTED"""
+        breakdown = {
+            "grid_and_metering": {"amount": 0, "percentage": 0, "components": []},
+            "taxes_and_levies": {"amount": 0, "percentage": 0, "components": []}, 
+            "energy_supply": {"amount": 0, "percentage": 0, "components": []},
+            "bonuses": {"amount": 0, "components": []}
+        }
+        
+        total_gross = self.get_invoice_amount()
+        
+        # Try Kostenblock first
+        if self.cost_breakdown:
+            for cost_block in self.cost_breakdown:
+                name = cost_block.get("printItemName", "")
+                amount = float(cost_block.get("amount", 0))
+                percentage = float(cost_block.get("percentageAmount", 0))
+                
+                if "Netz" in name or "Messung" in name:
+                    breakdown["grid_and_metering"]["amount"] = amount
+                    breakdown["grid_and_metering"]["percentage"] = percentage
+                elif "Steuer" in name or "Umlage" in name:
+                    breakdown["taxes_and_levies"]["amount"] = amount  
+                    breakdown["taxes_and_levies"]["percentage"] = percentage
+                elif "Beschaffung" in name or "Vertrieb" in name:
+                    breakdown["energy_supply"]["amount"] = amount
+                    breakdown["energy_supply"]["percentage"] = percentage
+        
+        # Calculate from components if Kostenblock not available
+        else:
+            levies = self.get_specific_levy_amounts()
+            
+            grid_amount = levies["Netznutzung"] + levies["Messstellenbetrieb"]
+            levy_amount = (levies["KWKG-Umlage"] + levies["Offshore-Netzumlage"] + 
+                          levies["Konzessionsabgabe"] + levies["NEV-Umlage"] + 
+                          levies["Stromsteuer"] + self.get_tax_amount())
+            
+            net_amount = self.get_net_amount()
+            supply_amount = net_amount - grid_amount - (levy_amount - self.get_tax_amount())
+            
+            breakdown["grid_and_metering"]["amount"] = grid_amount
+            breakdown["grid_and_metering"]["percentage"] = (grid_amount / total_gross * 100) if total_gross > 0 else 0
+            
+            breakdown["taxes_and_levies"]["amount"] = levy_amount
+            breakdown["taxes_and_levies"]["percentage"] = (levy_amount / total_gross * 100) if total_gross > 0 else 0
+            
+            breakdown["energy_supply"]["amount"] = supply_amount
+            breakdown["energy_supply"]["percentage"] = (supply_amount / total_gross * 100) if total_gross > 0 else 0
+        
+        # Add bonus information
+        bonus_amount = self.get_bonus_amount()
+        if bonus_amount != 0:
+            breakdown["bonuses"]["amount"] = bonus_amount
+        
+        return breakdown
+    
     def analyze_unusual_charges(self) -> List[Dict[str, Any]]:
-        """Identify and explain unusual or high charges"""
+        """Identify unusual charges - keeping original logic"""
         unusual_items = []
         
         # Check for high basic charges
@@ -270,53 +377,17 @@ class IntelligentInvoiceAnalyzer:
                     unusual_items.append({
                         "type": "high_basic_charge",
                         "amount": amount,
-                        "explanation": "Higher than typical basic charge, possibly due to new contract setup or tariff change"
+                        "explanation": "Higher than typical basic charge"
                     })
         
-        # Check for zero usage charges
-        usage_charges = [item for item in self.billing_items if item.get("priceType") == "USAGE_RATE"]
-        if all(float(item.get("amount", 0)) == 0 for item in usage_charges):
+        # Check for zero consumption
+        if self.is_zero_consumption_bill():
             unusual_items.append({
-                "type": "zero_usage_charges", 
-                "explanation": "No usage charges applied - this typically occurs in initial/setup bills or when consumption is covered by prepayments"
+                "type": "zero_consumption_bill",
+                "explanation": "This is a setup/initial bill with zero consumption"
             })
             
         return unusual_items
-    
-    def get_detailed_cost_breakdown(self) -> Dict[str, Any]:
-        """Provide comprehensive cost analysis"""
-        breakdown = {
-            "grid_and_metering": {"amount": 0, "percentage": 0, "components": []},
-            "taxes_and_levies": {"amount": 0, "percentage": 0, "components": []}, 
-            "energy_supply": {"amount": 0, "percentage": 0, "components": []},
-            "bonuses": {"amount": 0, "components": []}
-        }
-        
-        total_gross = float(self.process_data.get("invoiceAmount", 0))
-        
-        for cost_block in self.cost_breakdown:
-            name = cost_block.get("printItemName", "")
-            amount = float(cost_block.get("amount", 0))
-            percentage = float(cost_block.get("percentageAmount", 0))
-            
-            if "Netz" in name or "Messung" in name:
-                breakdown["grid_and_metering"]["amount"] = amount
-                breakdown["grid_and_metering"]["percentage"] = percentage
-                
-            elif "Steuer" in name or "Umlage" in name:
-                breakdown["taxes_and_levies"]["amount"] = amount  
-                breakdown["taxes_and_levies"]["percentage"] = percentage
-                
-            elif "Beschaffung" in name or "Vertrieb" in name:
-                breakdown["energy_supply"]["amount"] = amount
-                breakdown["energy_supply"]["percentage"] = percentage
-        
-        # Add bonus information
-        bonus_amount = float(self.process_data.get("bonus", 0))
-        if bonus_amount != 0:
-            breakdown["bonuses"]["amount"] = bonus_amount
-            
-        return breakdown
 
 class ContextualQueryAnalyzer:
     """Analyzes user queries for intent and determines appropriate response strategy"""
@@ -661,7 +732,7 @@ class AgenticUtilityBillLLM:
     def build_contextual_prompt(self, query: str, analyzer: IntelligentInvoiceAnalyzer, 
                                query_type: QueryType, response_format: ResponseFormat,
                                language: str = 'en', comparison_data: Dict = None) -> str:
-        """Build sophisticated, context-aware prompt with proper language support"""
+        """Build sophisticated, context-aware prompt with CORRECTED data extraction"""
         
         # Customer information
         partner = analyzer.partner_data
@@ -679,11 +750,11 @@ class AgenticUtilityBillLLM:
         last_name = partner.get("name", "")
         customer_name = f"{first_name} {last_name}".strip()
         
-        # Invoice analysis with correct data extraction
+        # CORRECTED data extraction
         total_consumption, period_from, period_to = analyzer.get_total_consumption()
         cost_breakdown = analyzer.get_detailed_cost_breakdown()
-        working_price = analyzer.get_working_price()  # €/kWh
-        base_price_net, base_price_gross = analyzer.get_base_price()  # €/year
+        working_price_details = analyzer.get_working_price_details()
+        base_price_net, base_price_gross = analyzer.get_base_price()
         specific_levies = analyzer.get_specific_levy_amounts()
         is_zero_consumption = analyzer.is_zero_consumption_bill()
         
@@ -696,7 +767,7 @@ class AgenticUtilityBillLLM:
             "en": "IMPORTANT: Always respond in English. Use English terms and phrases."
         }
         
-        # Conciseness instructions based on level
+        # Conciseness instructions
         conciseness_instructions = {
             "brief": {
                 "de": "Antworte SEHR KURZ in 1-2 Sätzen. Nur die wichtigsten Fakten.",
@@ -712,7 +783,7 @@ class AgenticUtilityBillLLM:
             }
         }
         
-        # Base system instruction with STRONG language emphasis
+        # Build the corrected system instruction
         system_instruction = f"""You are KlarBill, an intelligent energy billing assistant.
 
 {language_instruction[language]}
@@ -723,38 +794,51 @@ PERIOD: {period_from} - {period_to}
 TOTAL AMOUNT: €{analyzer.get_invoice_amount():.2f}
 CONSUMPTION: {total_consumption:.0f} kWh{"" if not is_zero_consumption else " (ZERO CONSUMPTION - Setup/Initial Bill)"}
 
-TARIFF INFORMATION:
-- Working Price (Arbeitspreis): {working_price:.4f} €/kWh ({working_price*100:.2f} ct/kWh)
-- Base Price (Grundpreis): €{base_price_net:.2f}/year net, €{base_price_gross:.2f}/year gross
-
-SPECIFIC LEVIES ON THIS INVOICE:
+TARIFF RATES:
+- Working Price: {working_price_details['main_price_ct_per_kwh']:.2f} ct/kWh
+- Base Price: €{base_price_net:.2f}/year (net), €{base_price_gross:.2f}/year (gross)
+"""
+        
+        # Add multiple periods only if they exist
+        if working_price_details['has_multiple_periods']:
+            system_instruction += "\nWORKING PRICE PERIODS:\n"
+            for period in working_price_details['billed_periods']:
+                system_instruction += f"- {period['period']}: {period['price_ct_per_kwh']:.2f} ct/kWh\n"
+        
+        system_instruction += f"""
+SPECIFIC LEVY AMOUNTS (These are the actual €€ amounts charged):
 - KWKG-Umlage: €{specific_levies['KWKG-Umlage']:.2f}
 - Konzessionsabgabe: €{specific_levies['Konzessionsabgabe']:.2f}
 - Offshore-Netzumlage: €{specific_levies['Offshore-Netzumlage']:.2f}
 - NEV-Umlage: €{specific_levies['NEV-Umlage']:.2f}
 - Stromsteuer: €{specific_levies['Stromsteuer']:.2f}
+- Netznutzung: €{specific_levies['Netznutzung']:.2f}
+- Messstellenbetrieb: €{specific_levies['Messstellenbetrieb']:.2f}
+
+COST CATEGORIES (Distribution of costs, NOT tariff rates):
+- Grid & Metering: €{cost_breakdown['grid_and_metering']['amount']:.2f} ({cost_breakdown['grid_and_metering']['percentage']:.1f}%)
+- Taxes & Levies: €{cost_breakdown['taxes_and_levies']['amount']:.2f} ({cost_breakdown['taxes_and_levies']['percentage']:.1f}%)
+- Energy Supply: €{cost_breakdown['energy_supply']['amount']:.2f} ({cost_breakdown['energy_supply']['percentage']:.1f}%)
 
 RESPONSE STYLE: {conciseness_instructions[response_format.conciseness_level][language]}
 
 CRITICAL RULES:
-1. ALWAYS use actual invoice data - NEVER use placeholder values like X or €X.XX
+1. ALWAYS use actual invoice data - NEVER use placeholder values
 2. {"Antworte auf DEUTSCH" if language == "de" else "Respond in ENGLISH"}
-3. Working price is {working_price:.4f} €/kWh, NOT cost breakdown percentages
-4. Base price is €{base_price_net:.2f}/year, NOT a per-kWh rate
-5. KWKG-Umlage is €{specific_levies['KWKG-Umlage']:.2f}, NOT grid/metering costs
-6. Use customer's actual name: {customer_name}
-7. Answer the specific question directly
+3. Working price: {working_price_details['main_price_ct_per_kwh']:.2f} ct/kWh
+4. Base price: €{base_price_net:.2f}/year (annual fee)
+5. Use customer's actual name: {customer_name}
+6. Answer the specific question directly
 """
 
-        # Add invoice-specific data with correct interpretation
+        # Add invoice-specific breakdown
         system_instruction += f"""
-ACTUAL INVOICE BREAKDOWN:
+ACTUAL INVOICE CALCULATION:
 - Net Amount: €{analyzer.get_net_amount():.2f}
 - Tax (19% VAT): €{analyzer.get_tax_amount():.2f}
+- Gross Amount: €{analyzer.get_invoice_amount():.2f}
 - Bonus Applied: €{analyzer.get_bonus_amount():.2f}
-- Grid & Metering Category: €{cost_breakdown['grid_and_metering']['amount']:.2f} ({cost_breakdown['grid_and_metering']['percentage']:.1f}%)
-- Taxes & Levies Category: €{cost_breakdown['taxes_and_levies']['amount']:.2f} ({cost_breakdown['taxes_and_levies']['percentage']:.1f}%)
-- Energy Supply Category: €{cost_breakdown['energy_supply']['amount']:.2f} ({cost_breakdown['energy_supply']['percentage']:.1f}%)
+- Final Payment: €{analyzer.get_invoice_amount() + analyzer.get_bonus_amount():.2f}
 """
 
         # Add zero consumption explanation if applicable
@@ -768,45 +852,39 @@ WICHTIG - NULLVERBRAUCH: Diese Rechnung zeigt 0 kWh Verbrauch. Das ist typisch f
 IMPORTANT - ZERO CONSUMPTION: This invoice shows 0 kWh consumption. This is typical for setup/initial bills. You're only paying base fees and setup costs, no usage-based charges.
 """
 
-        # Add specific knowledge for common German energy terms
-        if "kwkg" in query.lower():
-            if language == "de":
-                system_instruction += f"""
-KWKG-UMLAGE SPEZIFISCH: Die KWKG-Umlage (Kraft-Wärme-Kopplungsgesetz) ist eine spezielle Abgabe zur Förderung von Kraft-Wärme-Kopplung. Auf Ihrer Rechnung: €{specific_levies['KWKG-Umlage']:.2f}. Dies ist NICHT dasselbe wie "Netz und Messung".
-"""
-            else:
-                system_instruction += f"""
-KWKG-LEVY SPECIFIC: KWKG-Umlage (Combined Heat and Power Act levy) is a specific German levy supporting cogeneration. On your invoice: €{specific_levies['KWKG-Umlage']:.2f}. This is NOT the same as "Grid and Metering" costs.
-"""
-
+        # Add specific knowledge for common terms
         if "working price" in query.lower() or "arbeitspreis" in query.lower():
             if language == "de":
-                system_instruction += f"""
-ARBEITSPREIS SPEZIFISCH: Der Arbeitspreis ist {working_price:.4f} €/kWh ({working_price*100:.2f} ct/kWh). Das ist der Preis pro verbrauchter kWh, NICHT die Kostenkategorien wie "Beschaffung und Vertrieb".
-"""
+                if working_price_details['has_multiple_periods']:
+                    period_info = ', '.join([f"{p['price_ct_per_kwh']:.2f} ct/kWh ({p['period']})" for p in working_price_details['billed_periods']])
+                    system_instruction += f"ARBEITSPREIS DETAILS: {period_info}. "
+                else:
+                    system_instruction += f"ARBEITSPREIS DETAILS: {working_price_details['main_price_ct_per_kwh']:.2f} ct/kWh. "
             else:
-                system_instruction += f"""
-WORKING PRICE SPECIFIC: The working price is {working_price:.4f} €/kWh ({working_price*100:.2f} ct/kWh). This is the price per kWh consumed, NOT cost categories like "Procurement and Supply".
-"""
-
-        if "base price" in query.lower() or "grundpreis" in query.lower():
-            if language == "de":
-                system_instruction += f"""
-GRUNDPREIS SPEZIFISCH: Der Grundpreis ist €{base_price_net:.2f}/Jahr (netto) bzw. €{base_price_gross:.2f}/Jahr (brutto). Das ist eine feste Jahresgebühr, NICHT ein kWh-Preis.
-"""
-            else:
-                system_instruction += f"""
-BASE PRICE SPECIFIC: The base price is €{base_price_net:.2f}/year (net) or €{base_price_gross:.2f}/year (gross). This is a fixed annual fee, NOT a per-kWh rate.
-"""
+                if working_price_details['has_multiple_periods']:
+                    period_info = ', '.join([f"{p['price_ct_per_kwh']:.2f} ct/kWh ({p['period']})" for p in working_price_details['billed_periods']])
+                    system_instruction += f"WORKING PRICE DETAILS: {period_info}. "
+                else:
+                    system_instruction += f"WORKING PRICE DETAILS: {working_price_details['main_price_ct_per_kwh']:.2f} ct/kWh. "
 
         if "konzessionsabgabe" in query.lower():
             if language == "de":
                 system_instruction += f"""
-KONZESSIONSABGABE SPEZIFISCH: Die Konzessionsabgabe ist eine Gebühr an Gemeinden für die Nutzung öffentlicher Wege. Auf Ihrer Rechnung: €{specific_levies['Konzessionsabgabe']:.2f}. Die Höhe variiert nach Gemeindegröße.
+KONZESSIONSABGABE DETAILS: Auf Ihrer Rechnung wurden €{specific_levies['Konzessionsabgabe']:.2f} für die Konzessionsabgabe berechnet. Das ist eine Gebühr an Gemeinden für die Nutzung öffentlicher Wege.
 """
             else:
                 system_instruction += f"""
-CONCESSION FEE SPECIFIC: The concession fee is paid to municipalities for using public roads for power lines. On your invoice: €{specific_levies['Konzessionsabgabe']:.2f}. Rates vary by municipality size.
+CONCESSION FEE DETAILS: Your invoice shows €{specific_levies['Konzessionsabgabe']:.2f} for the concession fee. This is paid to municipalities for using public roads for power lines.
+"""
+
+        if "kwkg" in query.lower():
+            if language == "de":
+                system_instruction += f"""
+KWKG-UMLAGE DETAILS: Auf Ihrer Rechnung wurden €{specific_levies['KWKG-Umlage']:.2f} für die KWKG-Umlage berechnet. 2025 beträgt die KWKG-Umlage 0,277 ct/kWh zur Förderung von Kraft-Wärme-Kopplung.
+"""
+            else:
+                system_instruction += f"""
+KWKG-LEVY DETAILS: Your invoice shows €{specific_levies['KWKG-Umlage']:.2f} for the KWKG levy. In 2025, the KWKG levy is 0.277 ct/kWh to support combined heat and power.
 """
 
         # Add knowledge base context if highly relevant
@@ -817,7 +895,7 @@ CONCESSION FEE SPECIFIC: The concession fee is paid to municipalities for using 
                     system_instruction += f"- {item['response']}\n"
 
         # Query-specific instructions with correct data
-        if query_type == QueryType.SIMPLE_FACT and "aufschlüsseln" in query.lower():
+        if query_type == QueryType.SIMPLE_FACT and ("aufschlüsseln" in query.lower() or "breakdown" in query.lower()):
             if language == "de":
                 system_instruction += f"""
 KORREKTE KOSTENAUFSCHLÜSSELUNG:
@@ -835,33 +913,26 @@ CORRECT COST BREAKDOWN:
 - TOTAL = €{analyzer.get_invoice_amount():.2f}
 """
 
-        elif query_type == QueryType.COMPARISON and comparison_data and comparison_data.get("found"):
+        # Add comparison data if available
+        if comparison_data and comparison_data.get("found"):
             system_instruction += f"""
-COMPARISON DATA:
+COMPARISON WITH PREVIOUS INVOICE:
 - Previous: €{comparison_data['previous_amount']:.2f}
 - Current: €{comparison_data['current_amount']:.2f}  
 - Difference: €{comparison_data['difference']:.2f} ({'+' if comparison_data['difference'] > 0 else ''}{(comparison_data['difference'] / comparison_data['previous_amount'] * 100):.1f}%)
-- Reason: {comparison_data['reasons'][0] if comparison_data['reasons'] else 'No clear reason'}
+- Main Reason: {comparison_data['reasons'][0] if comparison_data['reasons'] else 'Similar billing period'}
 """
 
         # Final query instruction
         query_context = f"\nQUERY: {query}\n"
         
-        # Strong reminder about language and correct data usage
+        # Strong reminder about using correct data
         if language == "de":
-            query_context += "Antworte auf DEUTSCH mit korrekten Tarifdaten (nicht Kostenkategorien verwechseln)!\n"
+            query_context += "Antworte auf DEUTSCH mit korrekten Tarifdaten und echten Beträgen!\n"
         else:
-            query_context += "Respond in ENGLISH with correct tariff data (don't confuse with cost categories)!\n"
+            query_context += "Respond in ENGLISH with correct tariff data and actual amounts!\n"
         
         return system_instruction + query_context + f"\n{'Antwort' if language == 'de' else 'Response'}:"
-
-    def _format_component_details(self, analyzer: IntelligentInvoiceAnalyzer) -> str:
-        """Format detailed component breakdown for prompts"""
-        details = []
-        for item in analyzer.billing_items:
-            if float(item.get('amount', 0)) > 0:
-                details.append(f"- {item.get('name', 'Unknown')}: €{item.get('amount', 0)} ({'Base' if item.get('priceType') == 'BASIC_RATE' else 'Usage'} charge)")
-        return '\n'.join(details)
 
     def get_response(self, query: str, bill_context: Optional[Dict[str, Any]] = None,
                     language: str = 'en', customer_number: Optional[str] = None,
@@ -943,7 +1014,7 @@ COMPARISON DATA:
         # Prepare structured data with correct information
         total_consumption, period_from, period_to = analyzer.get_total_consumption()
         cost_breakdown = analyzer.get_detailed_cost_breakdown()
-        working_price = analyzer.get_working_price()
+        working_price_details = analyzer.get_working_price_details()
         base_price_net, base_price_gross = analyzer.get_base_price()
         specific_levies = analyzer.get_specific_levy_amounts()
         
@@ -959,8 +1030,8 @@ COMPARISON DATA:
             "invoice_number": analyzer.get_invoice_number(),
             "cost_breakdown": cost_breakdown,
             "tariff_info": {
-                "working_price_euro_per_kwh": working_price,
-                "working_price_ct_per_kwh": working_price * 100,
+                "working_price_ct_per_kwh": working_price_details['main_price_ct_per_kwh'],
+                "working_price_periods": working_price_details['billed_periods'] if working_price_details['has_multiple_periods'] else None,
                 "base_price_net_per_year": base_price_net,
                 "base_price_gross_per_year": base_price_gross
             },
