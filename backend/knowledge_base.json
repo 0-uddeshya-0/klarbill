@@ -10,8 +10,8 @@
       {
         "input_en": "Where is the MaLo-ID on my invoice?",
         "input_de": "Wo finde ich die MaLo-ID auf meiner Rechnung?",
-        "response_en": "The Metering Point Identification Number (MaLo-ID) is under **'Supplied Consumption Point'**. It's a 33-character code starting with 'DE'.",
-        "response_de": "Die Messstellenidentifikationsnummer (MaLo-ID) befindet sich unter **'Versorgter Verbrauchsort'**. Es ist ein 33-stelliger Code, der mit 'DE' beginnt."
+        "response_en": "The Market Location Identification Number, or MaLo ID, is an eleven-digit number. You can find it under the **'Ihre Lieferstelle'** section on Page 3 of your invoice.",
+        "response_de": "Die Marktlokations-ID (MaLo-ID) ist eine elfstellige Nummer. Sie finden sie im Abschnitt **'Ihre Lieferstelle'** auf Seite 3 Ihrer Rechnung."
       },
       {
         "input_en": "What is the meaning of 'OBIS code' on my meter?",
