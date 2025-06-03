@@ -734,8 +734,8 @@ body.light .badge-container {
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 0.5rem;
-  background-color: #ffbe7e8b;
-  color: rgb(26, 26, 26);
+  background-color: #88b0ff8b;
+  color: rgb(235, 235, 235);
   border-radius: 1rem;
   font-size: 0.875rem;
   font-weight: 500;
@@ -744,6 +744,7 @@ body.light .badge-container {
 
 body.light .identifier-badge {
   background-color: #ffbe7e8b;
+  color: rgb(23, 23, 23);
 }
 
 @keyframes badgeSlideIn {
