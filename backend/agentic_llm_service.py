@@ -1,4 +1,4 @@
-# agentic_llm_service.py
+    # agentic_llm_service.py
 
 import os
 import re
@@ -41,39 +41,77 @@ class GermanEnergyRegulations:
             "name_en": "Grid Usage",
             "explanation_de": "Kosten für die Nutzung des Stromnetzes zur Übertragung und Verteilung",
             "explanation_en": "Costs for using the electricity grid for transmission and distribution",
-            "regulated_by": "Bundesnetzagentur"
+            "regulated_by": "Bundesnetzagentur",
+            "typical_amount": "Grid fees vary by region, typically 6-8 ct/kWh"
         },
         "messstellenbetrieb": {
             "name_de": "Messstellenbetrieb", 
             "name_en": "Metering Operation",
             "explanation_de": "Kosten für den Betrieb und die Wartung der Messeinrichtungen",
             "explanation_en": "Costs for operation and maintenance of measuring equipment",
-            "regulated_by": "MessstellenbetriebsG"
+            "regulated_by": "MessstellenbetriebsG",
+            "typical_amount": "€20-100 per year depending on meter type"
         },
         "stromsteuer": {
             "name_de": "Stromsteuer",
             "name_en": "Electricity Tax", 
             "explanation_de": "Bundessteuer auf Stromverbrauch, derzeit 2,05 ct/kWh",
             "explanation_en": "Federal tax on electricity consumption, currently 2.05 ct/kWh",
-            "current_rate": "0.0205"
+            "current_rate": "0.0205",
+            "regulated_by": "Federal Government"
         },
         "kwkg_umlage": {
             "name_de": "KWKG-Umlage",
-            "name_en": "CHP Levy",
-            "explanation_de": "Förderung von Kraft-Wärme-Kopplung zur Energieeffizienz",
-            "explanation_en": "Support for combined heat and power for energy efficiency"
+            "name_en": "CHP Levy (Combined Heat and Power)",
+            "explanation_de": "Förderung von Kraft-Wärme-Kopplung zur Energieeffizienz. NICHT dasselbe wie Netzkosten!",
+            "explanation_en": "Support for combined heat and power for energy efficiency. NOT the same as grid costs!",
+            "current_rate": "Variable, typically 0.2-0.5 ct/kWh",
+            "regulated_by": "Federal Government"
         },
         "offshore_umlage": {
             "name_de": "Offshore-Netzumlage", 
             "name_en": "Offshore Grid Levy",
             "explanation_de": "Finanzierung der Offshore-Windpark-Netzanbindung",
-            "explanation_en": "Financing of offshore wind farm grid connections"
+            "explanation_en": "Financing of offshore wind farm grid connections",
+            "current_rate": "Variable, typically 0.4-0.8 ct/kWh"
         },
         "konzessionsabgabe": {
             "name_de": "Konzessionsabgabe",
             "name_en": "Concession Fee", 
-            "explanation_de": "Entgelt an Gemeinden für die Nutzung öffentlicher Verkehrswege",
-            "explanation_en": "Fee to municipalities for using public roads"
+            "explanation_de": "Entgelt an Gemeinden für die Nutzung öffentlicher Verkehrswege für Stromleitungen",
+            "explanation_en": "Fee to municipalities for using public roads for power lines",
+            "typical_rates": {
+                "small_municipality": "0.11 ct/kWh",
+                "medium_municipality": "1.32 ct/kWh", 
+                "large_municipality": "2.39 ct/kWh"
+            }
+        },
+        "arbeitspreis": {
+            "name_de": "Arbeitspreis",
+            "name_en": "Working Price",
+            "explanation_de": "Preis pro verbrauchter kWh, meist in ct/kWh angegeben. NICHT die Kostenkategorien!",
+            "explanation_en": "Price per kWh consumed, usually stated in ct/kWh. NOT the cost categories!",
+            "note": "This is the actual tariff rate, separate from cost breakdown categories"
+        },
+        "grundpreis": {
+            "name_de": "Grundpreis",
+            "name_en": "Base Price",
+            "explanation_de": "Feste jährliche Grundgebühr, unabhängig vom Verbrauch. In €/Jahr, NICHT pro kWh!",
+            "explanation_en": "Fixed annual base fee, independent of consumption. In €/year, NOT per kWh!",
+            "note": "This is an annual fixed fee, not a per-unit charge"
+        }
+    }
+
+    BILLING_CATEGORIES_VS_TARIFFS = {
+        "cost_categories": {
+            "explanation_de": "Kostenkategorien zeigen die Verteilung der Gesamtkosten, NICHT die Tarife",
+            "explanation_en": "Cost categories show distribution of total costs, NOT the tariff rates",
+            "categories": ["Grid and Metering", "Taxes and Levies", "Procurement and Supply"]
+        },
+        "actual_tariffs": {
+            "explanation_de": "Echte Tarife sind Arbeitspreis (ct/kWh) und Grundpreis (€/Jahr)",
+            "explanation_en": "Actual tariffs are working price (ct/kWh) and base price (€/year)",
+            "components": ["Working Price", "Base Price"]
         }
     }
 
@@ -151,6 +189,74 @@ class IntelligentInvoiceAnalyzer:
     def get_invoice_number(self) -> str:
         """Get invoice number"""
         return self.process_data.get("invoiceNumber", "")
+    
+    def get_working_price(self) -> float:
+        """Get the actual working price (Arbeitspreis) in ct/kWh"""
+        # Extract from current tariff data, convert from ct to €
+        working_price_ct = float(self.process_data.get("currentWorkPrice", 0))
+        return working_price_ct / 100  # Convert ct/kWh to €/kWh
+    
+    def get_base_price(self) -> Tuple[float, float]:
+        """Get base price (Grundpreis) - returns (net_annual, gross_annual)"""
+        # Net base price from billing items
+        base_price_net = 0
+        for item in self.billing_items:
+            if item.get("priceType") == "BASIC_RATE" and item.get("name") == "Grundkosten":
+                base_price_net = float(item.get("amount", 0))
+                break
+        
+        # Gross base price from process data
+        base_price_gross = float(self.process_data.get("currentBasePrice", 0))
+        
+        return base_price_net, base_price_gross
+    
+    def get_kwkg_amount(self) -> float:
+        """Get actual KWKG-Umlage amount charged"""
+        kwkg_amount = 0
+        # Look in detailed billing items for KWKG-Umlage
+        for item in self.billing_items:
+            if item.get("Abrechnungspositionen-Detailliert"):
+                details = item["Abrechnungspositionen-Detailliert"]["Abrechnungspositionen-DetailliertElement"]
+                for detail in details:
+                    if "KWKG" in detail.get("name", ""):
+                        kwkg_amount += float(detail.get("amount", 0))
+        return kwkg_amount
+    
+    def is_zero_consumption_bill(self) -> bool:
+        """Check if this is a zero consumption bill (setup/initial)"""
+        total_consumption, _, _ = self.get_total_consumption()
+        return total_consumption == 0
+    
+    def get_specific_levy_amounts(self) -> Dict[str, float]:
+        """Get specific amounts for each German energy levy"""
+        levies = {
+            "KWKG-Umlage": 0,
+            "Offshore-Netzumlage": 0,
+            "Konzessionsabgabe": 0,
+            "NEV-Umlage": 0,
+            "Stromsteuer": 0
+        }
+        
+        # Look through detailed billing items
+        for item in self.billing_items:
+            if item.get("Abrechnungspositionen-Detailliert"):
+                details = item["Abrechnungspositionen-Detailliert"]["Abrechnungspositionen-DetailliertElement"]
+                for detail in details:
+                    name = detail.get("name", "")
+                    amount = float(detail.get("amount", 0))
+                    
+                    if "KWKG" in name:
+                        levies["KWKG-Umlage"] += amount
+                    elif "Offshore" in name:
+                        levies["Offshore-Netzumlage"] += amount
+                    elif "Konzessionsabgabe" in name:
+                        levies["Konzessionsabgabe"] += amount
+                    elif "NEV" in name:
+                        levies["NEV-Umlage"] += amount
+                    elif "Stromsteuer" in name:
+                        levies["Stromsteuer"] += amount
+        
+        return levies
     
     def analyze_unusual_charges(self) -> List[Dict[str, Any]]:
         """Identify and explain unusual or high charges"""
@@ -573,9 +679,13 @@ class AgenticUtilityBillLLM:
         last_name = partner.get("name", "")
         customer_name = f"{first_name} {last_name}".strip()
         
-        # Invoice analysis
+        # Invoice analysis with correct data extraction
         total_consumption, period_from, period_to = analyzer.get_total_consumption()
         cost_breakdown = analyzer.get_detailed_cost_breakdown()
+        working_price = analyzer.get_working_price()  # €/kWh
+        base_price_net, base_price_gross = analyzer.get_base_price()  # €/year
+        specific_levies = analyzer.get_specific_levy_amounts()
+        is_zero_consumption = analyzer.is_zero_consumption_bill()
         
         # Get relevant knowledge base context
         kb_context = self.knowledge_base.find_relevant_context(query, language, max_items=3)
@@ -610,39 +720,93 @@ class AgenticUtilityBillLLM:
 CUSTOMER: {salutation} {customer_name}
 INVOICE: #{analyzer.get_invoice_number()}
 PERIOD: {period_from} - {period_to}
-AMOUNT: €{analyzer.get_invoice_amount():.2f}
-CONSUMPTION: {total_consumption:.0f} kWh
+TOTAL AMOUNT: €{analyzer.get_invoice_amount():.2f}
+CONSUMPTION: {total_consumption:.0f} kWh{"" if not is_zero_consumption else " (ZERO CONSUMPTION - Setup/Initial Bill)"}
+
+TARIFF INFORMATION:
+- Working Price (Arbeitspreis): {working_price:.4f} €/kWh ({working_price*100:.2f} ct/kWh)
+- Base Price (Grundpreis): €{base_price_net:.2f}/year net, €{base_price_gross:.2f}/year gross
+
+SPECIFIC LEVIES ON THIS INVOICE:
+- KWKG-Umlage: €{specific_levies['KWKG-Umlage']:.2f}
+- Konzessionsabgabe: €{specific_levies['Konzessionsabgabe']:.2f}
+- Offshore-Netzumlage: €{specific_levies['Offshore-Netzumlage']:.2f}
+- NEV-Umlage: €{specific_levies['NEV-Umlage']:.2f}
+- Stromsteuer: €{specific_levies['Stromsteuer']:.2f}
 
 RESPONSE STYLE: {conciseness_instructions[response_format.conciseness_level][language]}
 
 CRITICAL RULES:
 1. ALWAYS use actual invoice data - NEVER use placeholder values like X or €X.XX
 2. {"Antworte auf DEUTSCH" if language == "de" else "Respond in ENGLISH"}
-3. Format numbers properly: €{analyzer.get_invoice_amount():.2f} not €X.XX
-4. Use customer's actual name: {customer_name}
-5. Answer the specific question directly
+3. Working price is {working_price:.4f} €/kWh, NOT cost breakdown percentages
+4. Base price is €{base_price_net:.2f}/year, NOT a per-kWh rate
+5. KWKG-Umlage is €{specific_levies['KWKG-Umlage']:.2f}, NOT grid/metering costs
+6. Use customer's actual name: {customer_name}
+7. Answer the specific question directly
 """
 
-        # Add invoice-specific data
+        # Add invoice-specific data with correct interpretation
         system_instruction += f"""
-ACTUAL INVOICE DATA:
+ACTUAL INVOICE BREAKDOWN:
 - Net Amount: €{analyzer.get_net_amount():.2f}
 - Tax (19% VAT): €{analyzer.get_tax_amount():.2f}
 - Bonus Applied: €{analyzer.get_bonus_amount():.2f}
-- Grid & Metering: €{cost_breakdown['grid_and_metering']['amount']:.2f} ({cost_breakdown['grid_and_metering']['percentage']:.1f}%)
-- Taxes & Levies: €{cost_breakdown['taxes_and_levies']['amount']:.2f} ({cost_breakdown['taxes_and_levies']['percentage']:.1f}%)
-- Energy Supply: €{cost_breakdown['energy_supply']['amount']:.2f} ({cost_breakdown['energy_supply']['percentage']:.1f}%)
+- Grid & Metering Category: €{cost_breakdown['grid_and_metering']['amount']:.2f} ({cost_breakdown['grid_and_metering']['percentage']:.1f}%)
+- Taxes & Levies Category: €{cost_breakdown['taxes_and_levies']['amount']:.2f} ({cost_breakdown['taxes_and_levies']['percentage']:.1f}%)
+- Energy Supply Category: €{cost_breakdown['energy_supply']['amount']:.2f} ({cost_breakdown['energy_supply']['percentage']:.1f}%)
 """
 
-        # Add specific knowledge for common queries
-        if "konzessionsabgabe" in query.lower():
+        # Add zero consumption explanation if applicable
+        if is_zero_consumption:
             if language == "de":
                 system_instruction += """
-KONZESSIONSABGABE: Die Konzessionsabgabe ist eine Gebühr, die Energieversorger an Gemeinden für die Nutzung öffentlicher Verkehrswege für Stromleitungen zahlen. Die Höhe variiert nach Gemeindegröße (0,11-2,39 ct/kWh). Auf Ihrer Rechnung finden Sie diese unter "Steuern und Umlagen".
+WICHTIG - NULLVERBRAUCH: Diese Rechnung zeigt 0 kWh Verbrauch. Das ist typisch für Einrichtungs-/Startabrechnungen. Sie zahlen nur die Grundgebühr und Setup-Kosten, keine verbrauchsabhängigen Gebühren.
 """
             else:
                 system_instruction += """
-CONCESSION FEE: The concession fee is paid by energy suppliers to municipalities for using public roads for power lines. Rates vary by municipality size (0.11-2.39 ct/kWh). On your invoice, find this under "Taxes and Levies".
+IMPORTANT - ZERO CONSUMPTION: This invoice shows 0 kWh consumption. This is typical for setup/initial bills. You're only paying base fees and setup costs, no usage-based charges.
+"""
+
+        # Add specific knowledge for common German energy terms
+        if "kwkg" in query.lower():
+            if language == "de":
+                system_instruction += f"""
+KWKG-UMLAGE SPEZIFISCH: Die KWKG-Umlage (Kraft-Wärme-Kopplungsgesetz) ist eine spezielle Abgabe zur Förderung von Kraft-Wärme-Kopplung. Auf Ihrer Rechnung: €{specific_levies['KWKG-Umlage']:.2f}. Dies ist NICHT dasselbe wie "Netz und Messung".
+"""
+            else:
+                system_instruction += f"""
+KWKG-LEVY SPECIFIC: KWKG-Umlage (Combined Heat and Power Act levy) is a specific German levy supporting cogeneration. On your invoice: €{specific_levies['KWKG-Umlage']:.2f}. This is NOT the same as "Grid and Metering" costs.
+"""
+
+        if "working price" in query.lower() or "arbeitspreis" in query.lower():
+            if language == "de":
+                system_instruction += f"""
+ARBEITSPREIS SPEZIFISCH: Der Arbeitspreis ist {working_price:.4f} €/kWh ({working_price*100:.2f} ct/kWh). Das ist der Preis pro verbrauchter kWh, NICHT die Kostenkategorien wie "Beschaffung und Vertrieb".
+"""
+            else:
+                system_instruction += f"""
+WORKING PRICE SPECIFIC: The working price is {working_price:.4f} €/kWh ({working_price*100:.2f} ct/kWh). This is the price per kWh consumed, NOT cost categories like "Procurement and Supply".
+"""
+
+        if "base price" in query.lower() or "grundpreis" in query.lower():
+            if language == "de":
+                system_instruction += f"""
+GRUNDPREIS SPEZIFISCH: Der Grundpreis ist €{base_price_net:.2f}/Jahr (netto) bzw. €{base_price_gross:.2f}/Jahr (brutto). Das ist eine feste Jahresgebühr, NICHT ein kWh-Preis.
+"""
+            else:
+                system_instruction += f"""
+BASE PRICE SPECIFIC: The base price is €{base_price_net:.2f}/year (net) or €{base_price_gross:.2f}/year (gross). This is a fixed annual fee, NOT a per-kWh rate.
+"""
+
+        if "konzessionsabgabe" in query.lower():
+            if language == "de":
+                system_instruction += f"""
+KONZESSIONSABGABE SPEZIFISCH: Die Konzessionsabgabe ist eine Gebühr an Gemeinden für die Nutzung öffentlicher Wege. Auf Ihrer Rechnung: €{specific_levies['Konzessionsabgabe']:.2f}. Die Höhe variiert nach Gemeindegröße.
+"""
+            else:
+                system_instruction += f"""
+CONCESSION FEE SPECIFIC: The concession fee is paid to municipalities for using public roads for power lines. On your invoice: €{specific_levies['Konzessionsabgabe']:.2f}. Rates vary by municipality size.
 """
 
         # Add knowledge base context if highly relevant
@@ -652,22 +816,22 @@ CONCESSION FEE: The concession fee is paid by energy suppliers to municipalities
                 if item['relevance'] == 'high':
                     system_instruction += f"- {item['response']}\n"
 
-        # Query-specific instructions
+        # Query-specific instructions with correct data
         if query_type == QueryType.SIMPLE_FACT and "aufschlüsseln" in query.lower():
             if language == "de":
                 system_instruction += f"""
-KOSTENAUFSCHLÜSSELUNG:
+KORREKTE KOSTENAUFSCHLÜSSELUNG:
 - Grundgebühr + Verbrauchskosten = €{analyzer.get_net_amount():.2f} (netto)
 - Mehrwertsteuer (19%) = €{analyzer.get_tax_amount():.2f}
-- Bonus/Rabatt = -€{analyzer.get_bonus_amount():.2f}
+- Bonus/Rabatt = €{analyzer.get_bonus_amount():.2f}
 - GESAMT = €{analyzer.get_invoice_amount():.2f}
 """
             else:
                 system_instruction += f"""
-COST BREAKDOWN:
+CORRECT COST BREAKDOWN:
 - Base fee + Usage charges = €{analyzer.get_net_amount():.2f} (net)
 - VAT (19%) = €{analyzer.get_tax_amount():.2f}
-- Bonus/Discount = -€{analyzer.get_bonus_amount():.2f}
+- Bonus/Discount = €{analyzer.get_bonus_amount():.2f}
 - TOTAL = €{analyzer.get_invoice_amount():.2f}
 """
 
@@ -683,11 +847,11 @@ COMPARISON DATA:
         # Final query instruction
         query_context = f"\nQUERY: {query}\n"
         
-        # Strong reminder about language
+        # Strong reminder about language and correct data usage
         if language == "de":
-            query_context += "Antworte auf DEUTSCH mit echten Daten aus der Rechnung!\n"
+            query_context += "Antworte auf DEUTSCH mit korrekten Tarifdaten (nicht Kostenkategorien verwechseln)!\n"
         else:
-            query_context += "Respond in ENGLISH with actual invoice data!\n"
+            query_context += "Respond in ENGLISH with correct tariff data (don't confuse with cost categories)!\n"
         
         return system_instruction + query_context + f"\n{'Antwort' if language == 'de' else 'Response'}:"
 
@@ -776,9 +940,12 @@ COMPARISON DATA:
         max_tokens = 300 if response_format.conciseness_level == "brief" else 600 if response_format.conciseness_level == "moderate" else 1200
         response = self.model.generate(prompt, max_tokens=max_tokens, temp=0.1).strip()  # Very low temp for consistency
         
-        # Prepare structured data
+        # Prepare structured data with correct information
         total_consumption, period_from, period_to = analyzer.get_total_consumption()
         cost_breakdown = analyzer.get_detailed_cost_breakdown()
+        working_price = analyzer.get_working_price()
+        base_price_net, base_price_gross = analyzer.get_base_price()
+        specific_levies = analyzer.get_specific_levy_amounts()
         
         structured_data = {
             "customer_name": analyzer.partner_data.get("firstName", "") + " " + analyzer.partner_data.get("name", ""),
@@ -791,6 +958,14 @@ COMPARISON DATA:
             "bonus": analyzer.get_bonus_amount(),
             "invoice_number": analyzer.get_invoice_number(),
             "cost_breakdown": cost_breakdown,
+            "tariff_info": {
+                "working_price_euro_per_kwh": working_price,
+                "working_price_ct_per_kwh": working_price * 100,
+                "base_price_net_per_year": base_price_net,
+                "base_price_gross_per_year": base_price_gross
+            },
+            "specific_levies": specific_levies,
+            "is_zero_consumption": analyzer.is_zero_consumption_bill(),
             "unusual_charges": analyzer.analyze_unusual_charges(),
             "query_type": query_type.value,
             "response_format": {
